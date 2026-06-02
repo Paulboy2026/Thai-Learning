@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; --card: #ffffff; --text: #333333; --recording: #dc2626; }
+        :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; --card: #ffffff; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
         .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
@@ -19,16 +19,27 @@
 <div class="container">
     <h1>UKVI A1 - Nuanjan</h1>
     <select id="topic-nav" onchange="jumpToQuestion(this.value)"></select>
-    <div id="question" style="font-size: 20px; margin: 20px 0;">Loading...</div>
+    <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
     <button class="btn" onclick="speakQuestion()">🔊 Listen</button>
     <div id="options-container"></div>
-    <div id="feedback" style="margin: 10px 0; font-weight: bold;"></div>
+    <button id="next-btn" class="btn" style="display:none; background-color: var(--accent);" onclick="nextQuestion()">Next Question ➡️</button>
+    <div id="feedback" style="margin: 10px 0; font-weight: bold; text-align: center;"></div>
 </div>
 
 <script>
     const data = [
         { topic: "Personal Details", question: "Could you tell me your full name, please?", options: ["My name is Nuanjan.", "I come from Bangkok."], answer: "My name is Nuanjan." },
-        { topic: "Personal Details", question: "Can you spell your first name?", options: ["Yes, it is N-U-A-N-J-A-N.", "Yes, I like spelling."], answer: "Yes, it is N-U-A-N-J-A-N." }
+        { topic: "Personal Details", question: "Can you spell your first name?", options: ["Yes, it is N-U-A-N-J-A-N.", "Yes, I like spelling."], answer: "Yes, it is N-U-A-N-J-A-N." },
+        { topic: "Personal Details", question: "How old are you?", options: ["I am twenty-nine years old.", "I am thirty years old."], answer: "I am twenty-nine years old." },
+        { topic: "Daily Life", question: "What do you usually do in the morning?", options: ["I have breakfast and coffee.", "I like watching TV."], answer: "I have breakfast and coffee." },
+        { topic: "Housing", question: "How many rooms are there in your house?", options: ["There are five rooms.", "I live in a big city."], answer: "There are five rooms." },
+        { topic: "Travel", question: "How do you travel to the city center?", options: ["I usually take the bus.", "I walk to the park."], answer: "I usually take the bus." },
+        { topic: "Weather", question: "What is the weather like in your country today?", options: ["It is very hot and sunny.", "It is raining."], answer: "It is very hot and sunny." },
+        { topic: "Work", question: "What time do you start work?", options: ["I start work at eight.", "I work at a company."], answer: "I start work at eight." },
+        { topic: "Shopping", question: "How much is this shirt?", options: ["It is twenty pounds.", "It is a blue shirt."], answer: "It is twenty pounds." },
+        { topic: "Leisure", question: "What is your favorite hobby?", options: ["I like reading books.", "I like going to work."], answer: "I like reading books." },
+        { topic: "Food", question: "What is your favorite food?", options: ["My favorite food is Thai Pad Thai.", "I have lunch at one."], answer: "My favorite food is Thai Pad Thai." },
+        { topic: "Education", question: "Why do you want to live in the UK?", options: ["To live with my husband and study.", "I want to visit London."], answer: "To live with my husband and study." }
     ];
 
     let currentIndex = 0;
@@ -44,17 +55,10 @@
     }
 
     function speakQuestion() { 
-        // Force reset the synthesis engine to fix Chrome/Safari silence issues
         window.speechSynthesis.cancel(); 
-        const text = document.getElementById('question').innerText;
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-GB';
-        u.rate = 0.9;
-        
-        if (window.speechSynthesis.paused) {
-            window.speechSynthesis.resume();
-        }
-        
+        const u = new SpeechSynthesisUtterance(document.getElementById('question').innerText);
+        u.lang = 'en-GB'; u.rate = 0.9;
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
         window.speechSynthesis.speak(u); 
     }
 
@@ -63,10 +67,17 @@
         loadQuestion();
     }
 
+    function nextQuestion() {
+        currentIndex = (currentIndex + 1) % data.length;
+        loadQuestion();
+    }
+
     function loadQuestion() {
         const q = data[currentIndex];
         document.getElementById('question').innerText = q.question;
         document.getElementById('topic-nav').value = currentIndex;
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('feedback').innerText = "";
         
         const container = document.getElementById('options-container');
         container.innerHTML = "";
@@ -76,6 +87,7 @@
             b.innerText = opt;
             b.onclick = () => {
                 document.getElementById('feedback').innerText = (opt === q.answer) ? "Correct! 🌟" : "Incorrect.";
+                document.getElementById('next-btn').style.display = "block";
             };
             container.appendChild(b);
         });
