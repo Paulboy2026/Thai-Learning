@@ -126,7 +126,27 @@
         document.getElementById('progress-bar').style.width = ((currentIndex + 1) / data.length) * 100 + "%";
     }
 
-    function speakQuestion() { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(document.getElementById('question').innerText); u.lang = 'en-GB'; window.speechSynthesis.speak(u); }
+    ffunction speakQuestion() { 
+    // 1. Cancel any previous speech
+    window.speechSynthesis.cancel(); 
+
+    // 2. Create the utterance
+    const text = document.getElementById('question').innerText;
+    const u = new SpeechSynthesisUtterance(text);
+    
+    // 3. Set properties (Chrome often needs a voice to be explicitly set)
+    u.lang = 'en-GB';
+    u.rate = 0.9; // Slightly slower for better clarity
+    u.pitch = 1;
+
+    // 4. Force a "Resume" (Some mobile browsers pause the engine by default)
+    if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+    }
+
+    // 5. Speak
+    window.speechSynthesis.speak(u); 
+}
     
     async function toggleRecording() {
         if (!isRecording) {
