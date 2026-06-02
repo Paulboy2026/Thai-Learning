@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UKVI A1 App - Nuanjan</title>
+    <title>UKVI A1 - Nuanjan</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; --card: #ffffff; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -20,7 +19,11 @@
     <h1>UKVI A1 - Nuanjan</h1>
     <select id="topic-nav" onchange="jumpToQuestion(this.value)"></select>
     <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
+    
     <button class="btn" onclick="speakQuestion()">🔊 Listen</button>
+    <button id="record-btn" class="btn" onclick="toggleRecording()">Start Recording</button>
+    <button id="playback-btn" class="btn" onclick="playYourVoice()" disabled>Listen to Yourself</button>
+    
     <div id="options-container"></div>
     <button id="next-btn" class="btn" style="display:none; background-color: var(--accent);" onclick="nextQuestion()">Next Question ➡️</button>
     <div id="feedback" style="margin: 10px 0; font-weight: bold; text-align: center;"></div>
@@ -42,14 +45,13 @@
         { topic: "Education", question: "Why do you want to live in the UK?", options: ["To live with my husband and study.", "I want to visit London."], answer: "To live with my husband and study." }
     ];
 
-    let currentIndex = 0;
+    let currentIndex = 0, mediaRecorder, audioUrl, isRecording = false;
 
     function populateNavigation() {
         const nav = document.getElementById('topic-nav');
         data.forEach((item, index) => {
             const opt = document.createElement('option');
-            opt.value = index;
-            opt.innerText = `${index + 1}. ${item.topic}`;
+            opt.value = index; opt.innerText = `${index + 1}. ${item.topic}`;
             nav.appendChild(opt);
         });
     }
@@ -62,15 +64,28 @@
         window.speechSynthesis.speak(u); 
     }
 
-    function jumpToQuestion(index) {
-        currentIndex = parseInt(index);
-        loadQuestion();
+    async function toggleRecording() {
+        if (!isRecording) {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            let chunks = [];
+            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            mediaRecorder.onstop = () => { audioUrl = URL.createObjectURL(new Blob(chunks)); document.getElementById('playback-btn').disabled = false; };
+            mediaRecorder.start(); isRecording = true; document.getElementById('record-btn').innerText = "🛑 Stop";
+        } else {
+            mediaRecorder.stop(); isRecording = false; document.getElementById('record-btn').innerText = "Start Recording";
+        }
     }
 
-    function nextQuestion() {
-        currentIndex = (currentIndex + 1) % data.length;
-        loadQuestion();
+    function playYourVoice() { 
+        if (audioUrl) {
+            const audio = new Audio(audioUrl);
+            audio.play().catch(e => alert("Please tap again to allow audio."));
+        }
     }
+
+    function jumpToQuestion(index) { currentIndex = parseInt(index); loadQuestion(); }
+    function nextQuestion() { currentIndex = (currentIndex + 1) % data.length; loadQuestion(); }
 
     function loadQuestion() {
         const q = data[currentIndex];
@@ -78,13 +93,11 @@
         document.getElementById('topic-nav').value = currentIndex;
         document.getElementById('next-btn').style.display = "none";
         document.getElementById('feedback').innerText = "";
-        
         const container = document.getElementById('options-container');
         container.innerHTML = "";
         q.options.forEach(opt => {
             const b = document.createElement('button');
-            b.className = 'option-btn';
-            b.innerText = opt;
+            b.className = 'option-btn'; b.innerText = opt;
             b.onclick = () => {
                 document.getElementById('feedback').innerText = (opt === q.answer) ? "Correct! 🌟" : "Incorrect.";
                 document.getElementById('next-btn').style.display = "block";
