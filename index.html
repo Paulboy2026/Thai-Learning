@@ -95,11 +95,19 @@
         document.getElementById('feedback').innerText = "";
         const container = document.getElementById('options-container');
         container.innerHTML = "";
+        
         q.options.forEach(opt => {
             const b = document.createElement('button');
             b.className = 'option-btn'; b.innerText = opt;
             b.onclick = () => {
-                document.getElementById('feedback').innerText = (opt === q.answer) ? "Correct! 🌟" : "Incorrect.";
+                // Speech feedback on selection
+                const isCorrect = (opt === q.answer);
+                const feedbackMsg = isCorrect ? "Correct" : "Incorrect";
+                const u = new SpeechSynthesisUtterance("You selected " + opt + ". " + feedbackMsg);
+                u.lang = 'en-GB';
+                window.speechSynthesis.speak(u);
+                
+                document.getElementById('feedback').innerText = isCorrect ? "Correct! 🌟" : "Incorrect.";
                 document.getElementById('next-btn').style.display = "block";
             };
             container.appendChild(b);
