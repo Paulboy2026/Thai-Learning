@@ -5,78 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UKVI A1 App - Nuanjan</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; --card: #ffffff; --text: #333333; --recording: #dc2626; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
-        h1 { text-align: center; color: var(--primary); margin-top: 0; font-size: 24px; }
-        .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 10px; margin-bottom: 5px; height: 10px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background-color: var(--accent); transition: width 0.4s ease-in-out; }
-        .days-count { font-size: 12px; color: #64748b; margin-bottom: 15px; text-align: center; font-weight: 600; }
-        .score-board { display: flex; justify-content: space-between; align-items: center; background: #eef2f7; padding: 10px 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; }
-        .card { border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 20px; background: #fafafa; }
-        .topic-tag { display: inline-block; background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; }
-        .thai-hint { color: #d97706; font-weight: 500; font-size: 15px; margin-top: 5px; background: #fef3c7; padding: 6px; border-radius: 6px; display: inline-block; }
-        .question-text { font-size: 22px; font-weight: 600; margin: 15px 0; color: #1e293b; }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 10px; transition: background 0.2s; font-weight: bold; }
-        .btn:hover { background: #001854; }
-        .btn-audio { background: #4a5568; margin-top: 10px;}
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
-        .option-btn { background: white; border: 2px solid #cbd5e1; padding: 14px; border-radius: 8px; cursor: pointer; text-align: left; font-size: 16px; color: #334155; font-weight: 500; }
-        .option-btn:hover { border-color: var(--primary); background: #f8fafc; }
-        .feedback { margin-top: 15px; font-weight: bold; font-size: 18px; text-align: center; min-height: 26px; }
-        .correct { color: #16a34a; }
-        .wrong { color: var(--accent); }
+        .score-board { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card { border: 2px solid #e2e8f0; padding: 20px; text-align: center; margin-bottom: 20px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
+        .option-btn { background: white; border: 2px solid #cbd5e1; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; text-align: left; }
+        .recording { background-color: var(--recording) !important; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>UKVI A1 - Nuanjan's App</h1>
-    <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
-    <div id="days-count" class="days-count">Day 1 of 60 Day Challenge</div>
-
     <div class="score-board">
         <span>Score: <span id="score">0</span></span>
-        <select id="topic-nav" onchange="jumpToQuestion(this.value)" style="padding: 5px; border-radius: 5px;">
-            <option value="">Jump to Question...</option>
-        </select>
+        <select id="topic-nav" onchange="jumpToQuestion(this.value)"></select>
     </div>
 
     <div class="card">
-        <span class="topic-tag" id="tag">Loading...</span><br>
-        <div class="thai-hint" id="thai-translation"></div>
-        <div class="question-text" id="question"></div>
-        <button class="btn btn-audio" onclick="speakQuestion()">🔊 Listen</button>
-        <div class="recorder-section" style="margin-top:15px;">
-            <button id="record-btn" class="btn" onclick="toggleRecording()">Start Recording</button>
-        </div>
+        <div id="question">Loading...</div>
+        <button class="btn" onclick="speakQuestion()">🔊 Listen</button>
+        <button id="record-btn" class="btn" onclick="toggleRecording()">Start Recording</button>
+        <button id="playback-btn" class="btn" onclick="playYourVoice()" disabled>Listen to Yourself</button>
     </div>
 
-    <div class="options-grid" id="options-container"></div>
-    <div class="feedback" id="feedback"></div>
+    <div id="options-container"></div>
     <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none; background-color: var(--accent);">Next Question ➡️</button>
 </div>
 
 <script>
     const data = [
-        { topic: "Personal Details", question: "Could you tell me your full name, please?", thai: "คุณช่วยบอกชื่อนามสกุลเต็มของคุณหน่อยได้ไหม?", options: ["My name is Nuanjan.", "I come from Bangkok.", "Yes, here is my passport."], answer: "My name is Nuanjan." },
-        { topic: "Personal Details", question: "Can you spell your first name for me?", thai: "คุณช่วยสะกดชื่อจริงของคุณได้ไหม?", options: ["Yes, it is N-U-A-N-J-A-N.", "Yes, I like spelling.", "No, I live in London."], answer: "Yes, it is N-U-A-N-J-A-N." },
-        { topic: "Personal Details", question: "How old are you?", thai: "คุณอายุเท่าไหร่?", options: ["I am twenty-nine years old.", "I am thirty years old.", "I am twenty-five."], answer: "I am twenty-nine years old." },
-        { topic: "Family and Friends", question: "How often do you talk to your best friend?", thai: "คุณคุยกับเพื่อนสนิทของคุณบ่อยแค่ไหน?", options: ["I talk to her every day on the phone.", "She is twenty-nine years old.", "No, she lives in Thailand."], answer: "I talk to her every day on the phone." },
-        { topic: "Housing", question: "What is your favorite room in your house?", thai: "ห้องไหนเป็นห้องที่คุณชอบที่สุดในบ้าน?", options: ["I like the kitchen because I love cooking.", "My house has two bedrooms.", "I live in a small town."], answer: "I like the kitchen because I love cooking." },
-        { topic: "Buying Goods", question: "Where do you prefer to go shopping for clothes?", thai: "คุณชอบไปซื้อเสื้อผ้าที่ไหนมากกว่ากัน?", options: ["I prefer shopping at the local mall.", "It costs forty pounds.", "I bought a blue dress yesterday."], answer: "I prefer shopping at the local mall." },
-        { topic: "Transport", question: "How long does it take to travel to the city center?", thai: "ใช้เวลาเดินทางไปใจกลางเมืองนานเท่าไหร่?", options: ["It takes about thirty minutes by train.", "I travel with my sister.", "The ticket is five pounds."], answer: "It takes about thirty minutes by train." },
-        { topic: "Weather", question: "What do you like to do when it is raining outside?", thai: "คุณชอบทำอะไรเวลาที่ฝนตกข้างนอก?", options: ["I like to stay home and watch films.", "I like hot weather.", "It is very cold today."], answer: "I like to stay home and watch films." },
-        { topic: "Leisure", question: "What are your plans for next weekend?", thai: "แผนการสำหรับวันหยุดสุดสัปดาห์หน้าของคุณคืออะไร?", options: ["I am going to visit a park with my family.", "I relaxed last weekend.", "I like listening to music."], answer: "I am going to visit a park with my family." },
-        { topic: "Food", question: "What time do you usually have your dinner?", thai: "ปกติคุณทานอาหารเย็นตอนกี่โมง?", options: ["I usually have dinner at seven o'clock in the evening.", "I like eating Thai spicy food.", "I eat out at restaurants."], answer: "I usually have dinner at seven o'clock in the evening." },
-        { topic: "Work", question: "What do you find interesting about your job?", thai: "คุณคิดว่าอะไรคือสิ่งที่น่าสนใจเกี่ยวกับงานของคุณ?", options: ["I enjoy meeting new people every day.", "I work from Monday to Friday.", "I am an office assistant."], answer: "I enjoy meeting new people every day." },
-        { topic: "Education & Tech", question: "Why do you want to learn English?", thai: "มไมคุณถึงต้องการเรียนภาษาอังกฤษ?", options: ["Because I want to live and talk to people in the UK.", "Yes, I study online every day.", "English is very difficult for me."], answer: "Because I want to live and talk to people in the UK." }
+        { topic: "Personal Details", question: "Could you tell me your full name, please?", options: ["My name is Nuanjan.", "I come from Bangkok."], answer: "My name is Nuanjan." },
+        { topic: "Personal Details", question: "Can you spell your first name for me?", options: ["Yes, it is N-U-A-N-J-A-N.", "Yes, I like spelling."], answer: "Yes, it is N-U-A-N-J-A-N." },
+        { topic: "Personal Details", question: "How old are you?", options: ["I am twenty-nine years old.", "I am thirty years old."], answer: "I am twenty-nine years old." }
     ];
 
-    let currentIndex = 0;
-    let score = 0;
+    let currentIndex = 0, score = 0, mediaRecorder = null, audioUrl = null, isRecording = false;
 
     function populateNavigation() {
         const nav = document.getElementById('topic-nav');
@@ -89,45 +57,17 @@
     }
 
     function jumpToQuestion(index) {
-        if (index === "") return;
         currentIndex = parseInt(index);
         saveAppState();
         loadQuestion();
     }
 
-    function saveAppState() {
-        localStorage.setItem('ukvi_app_state', JSON.stringify({ index: currentIndex, score: score }));
-    }
-
-    function loadAppState() {
-        const saved = localStorage.getItem('ukvi_app_state');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            currentIndex = parsed.index;
-            score = parsed.score;
-            document.getElementById('score').innerText = score;
-        }
-        loadQuestion();
-    }
+    function saveAppState() { localStorage.setItem('ukvi_app_state', JSON.stringify({ index: currentIndex, score: score })); }
 
     function loadQuestion() {
-        // Update Days Counter
-        let start = localStorage.getItem('ukvi_app_start_date');
-        if (!start) { start = new Date().toISOString(); localStorage.setItem('ukvi_app_start_date', start); }
-        const days = Math.floor((new Date() - new Date(start)) / (1000 * 60 * 60 * 24)) + 1;
-        document.getElementById('days-count').innerText = `Day ${Math.min(days, 60)} of 60 Day Challenge`;
-
-        // Update Progress
-        document.getElementById('progress-bar').style.width = ((currentIndex / data.length) * 100) + "%";
-        document.getElementById('topic-nav').value = currentIndex;
-
-        if(currentIndex >= data.length) { document.querySelector('.card').innerHTML = "<h2>Course Finished!</h2>"; return; }
-
         const q = data[currentIndex];
-        document.getElementById('tag').innerText = q.topic;
-        document.getElementById('thai-translation').innerText = q.thai;
         document.getElementById('question').innerText = q.question;
-        document.getElementById('feedback').innerText = "";
+        document.getElementById('topic-nav').value = currentIndex;
         document.getElementById('next-btn').style.display = "none";
         
         const container = document.getElementById('options-container');
@@ -137,23 +77,41 @@
             b.className = 'option-btn';
             b.innerText = opt;
             b.onclick = () => {
-                if(opt === q.answer) {
-                    score += 10;
-                    document.getElementById('score').innerText = score;
-                    document.getElementById('feedback').innerText = "Correct! 🌟";
-                } else {
-                    document.getElementById('feedback').innerText = "Incorrect.";
-                }
-                document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+                if(opt === q.answer) { score += 10; document.getElementById('score').innerText = score; }
                 document.getElementById('next-btn').style.display = "block";
             };
             container.appendChild(b);
         });
     }
 
+    function speakQuestion() { 
+        const u = new SpeechSynthesisUtterance(document.getElementById('question').innerText);
+        u.lang = 'en-GB'; window.speechSynthesis.speak(u); 
+    }
+
+    async function toggleRecording() {
+        if (!isRecording) {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            let chunks = [];
+            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            mediaRecorder.onstop = () => { audioUrl = URL.createObjectURL(new Blob(chunks)); document.getElementById('playback-btn').disabled = false; };
+            mediaRecorder.start();
+            isRecording = true;
+            document.getElementById('record-btn').innerText = "🛑 Stop";
+            document.getElementById('record-btn').classList.add('recording');
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            document.getElementById('record-btn').innerText = "Start Recording";
+            document.getElementById('record-btn').classList.remove('recording');
+        }
+    }
+
+    function playYourVoice() { if (audioUrl) new Audio(audioUrl).play(); }
     function nextQuestion() { currentIndex++; saveAppState(); loadQuestion(); }
 
-    window.onload = () => { populateNavigation(); loadAppState(); };
+    window.onload = () => { populateNavigation(); loadQuestion(); };
 </script>
 </body>
 </html>
