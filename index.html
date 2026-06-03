@@ -1,3 +1,10 @@
+I have integrated your full **100-question bank** into the final, robust script. This version includes:
+
+1. **Fixed Chrome Compatibility**: Added `setTimeout` to ensure data initializes before the UI loads.
+2. **Interactive Multiple-Choice**: The app now generates one correct answer and three random distractors from your bank.
+3. **Full Data Integration**: All your specific answers (e.g., Bang Kapi, Nissan experience) are now live.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,14 +17,13 @@
         .container { max-width: 600px; width: 100%; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
         .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
         .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; }
-        label { font-weight: bold; }
+        .option-btn:hover { background: #e2e8f0; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>UKVI A1 Practice</h1>
-    
     <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
         <option value="All">All Topics</option>
@@ -29,7 +35,7 @@
     </select>
 
     <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
-    <button class="btn" onclick="speakQuestion()">🔊 Listen</button>
+    <button class="btn" onclick="speakQuestion()">🔊 Listen to Question</button>
     <div id="options-container"></div>
     <button id="next-btn" class="btn" style="display:none; background-color: var(--accent);" onclick="loadRandomQuestion()">Next Question ➡️</button>
     <div id="feedback" style="font-weight: bold; text-align: center; margin-top: 10px;"></div>
@@ -140,11 +146,11 @@
     };
 
     let currentPool = [];
+    let currentQuestion = null;
 
     function loadCategory(category) {
         if (category === "All") {
-            currentPool = [];
-            Object.values(questionBank).forEach(cat => currentPool.push(...cat));
+            currentPool = [].concat(...Object.values(questionBank));
         } else {
             currentPool = questionBank[category] || [];
         }
@@ -152,39 +158,51 @@
     }
 
     function loadRandomQuestion() {
-        if (currentPool.length === 0) {
-            document.getElementById('question').innerText = "No questions available.";
-            return;
-        }
-        const q = currentPool[Math.floor(Math.random() * currentPool.length)];
-        document.getElementById('question').innerText = q.q;
+        if (currentPool.length === 0) return;
+        currentQuestion = currentPool[Math.floor(Math.random() * currentPool.length)];
+        document.getElementById('question').innerText = currentQuestion.q;
         document.getElementById('next-btn').style.display = "none";
         document.getElementById('feedback').innerText = "";
         
         const container = document.getElementById('options-container');
         container.innerHTML = "";
-        const b = document.createElement('button');
-        b.className = 'option-btn';
-        b.innerText = "Click to reveal answer";
-        b.onclick = () => {
-            b.innerText = q.a;
-            document.getElementById('feedback').innerText = "Correct! ✅";
-            document.getElementById('next-btn').style.display = "block";
-            const u = new SpeechSynthesisUtterance(q.a);
-            u.lang = 'en-GB';
-            window.speechSynthesis.speak(u);
-        };
-        container.appendChild(b);
+        
+        let options = [currentQuestion.a];
+        while (options.length < 4) {
+            let randomQ = currentPool[Math.floor(Math.random() * currentPool.length)];
+            if (!options.includes(randomQ.a)) options.push(randomQ.a);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'option-btn';
+            b.innerText = opt;
+            b.onclick = () => {
+                if (opt === currentQuestion.a) {
+                    document.getElementById('feedback').innerText = "Correct! ✅";
+                    const u = new SpeechSynthesisUtterance(currentQuestion.a);
+                    u.lang = 'en-GB';
+                    window.speechSynthesis.speak(u);
+                    document.getElementById('next-btn').style.display = "block";
+                } else {
+                    document.getElementById('feedback').innerText = "Try again! ❌";
+                }
+            };
+            container.appendChild(b);
+        });
     }
 
     function speakQuestion() { 
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(document.getElementById('question').innerText);
+        const u = new SpeechSynthesisUtterance(currentQuestion.q);
         u.lang = 'en-GB';
         window.speechSynthesis.speak(u); 
     }
 
-    window.onload = () => loadCategory("All");
+    window.onload = () => setTimeout(() => loadCategory("All"), 100);
 </script>
 </body>
 </html>
+
+```
