@@ -3,118 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UKVI A1 - Nuanjan</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>UKVI A1 - 100 Question Bank</title>
     <style>
-        :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; --card: #ffffff; }
+        :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 600px; width: 100%; background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
+        .container { max-width: 600px; width: 100%; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
         .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
-        .option-btn { background: white; border: 2px solid #cbd5e1; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; text-align: left; }
+        .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>UKVI A1 - Nuanjan</h1>
-    <select id="topic-nav" onchange="jumpToQuestion(this.value)"></select>
+    <h1>UKVI A1 Practice</h1>
     <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
-    
     <button class="btn" onclick="speakQuestion()">🔊 Listen</button>
-    <button id="record-btn" class="btn" onclick="toggleRecording()">Start Recording</button>
-    <button id="playback-btn" class="btn" onclick="playYourVoice()" disabled>Listen to Yourself</button>
-    
     <div id="options-container"></div>
-    <button id="next-btn" class="btn" style="display:none; background-color: var(--accent);" onclick="nextQuestion()">Next Question ➡️</button>
-    <div id="feedback" style="margin: 10px 0; font-weight: bold; text-align: center;"></div>
+    <button id="next-btn" class="btn" style="display:none; background-color: var(--accent);" onclick="loadRandomQuestion()">Next Question ➡️</button>
+    <div id="feedback" style="font-weight: bold; text-align: center;"></div>
 </div>
 
 <script>
-    const data = [
-        { topic: "Personal Details", question: "Could you tell me your full name, please?", options: ["My name is Nuanjan.", "I come from Bangkok."], answer: "My name is Nuanjan." },
-        { topic: "Personal Details", question: "Can you spell your first name?", options: ["Yes, it is N-U-A-N-J-A-N.", "Yes, I like spelling."], answer: "Yes, it is N-U-A-N-J-A-N." },
-        { topic: "Personal Details", question: "How old are you?", options: ["I am twenty-nine years old.", "I am thirty years old."], answer: "I am twenty-nine years old." },
-        { topic: "Daily Life", question: "What do you usually do in the morning?", options: ["I have breakfast and coffee.", "I like watching TV."], answer: "I have breakfast and coffee." },
-        { topic: "Housing", question: "How many rooms are there in your house?", options: ["There are five rooms.", "I live in a big city."], answer: "There are five rooms." },
-        { topic: "Travel", question: "How do you travel to the city center?", options: ["I usually take the bus.", "I walk to the park."], answer: "I usually take the bus." },
-        { topic: "Weather", question: "What is the weather like in your country today?", options: ["It is very hot and sunny.", "It is raining."], answer: "It is very hot and sunny." },
-        { topic: "Work", question: "What time do you start work?", options: ["I start work at eight.", "I work at a company."], answer: "I start work at eight." },
-        { topic: "Shopping", question: "How much is this shirt?", options: ["It is twenty pounds.", "It is a blue shirt."], answer: "It is twenty pounds." },
-        { topic: "Leisure", question: "What is your favorite hobby?", options: ["I like reading books.", "I like going to work."], answer: "I like reading books." },
-        { topic: "Food", question: "What is your favorite food?", options: ["My favorite food is Thai Pad Thai.", "I have lunch at one."], answer: "My favorite food is Thai Pad Thai." },
-        { topic: "Education", question: "Why do you want to live in the UK?", options: ["To live with my husband and study.", "I want to visit London."], answer: "To live with my husband and study." }
-    ];
+    const questionBank = {
+        "Personal": [
+            { q: "What is your full name?", a: "My name is Nuanjan." },
+            { q: "Can you spell your first name?", a: "Yes, it is N-U-A-N-J-A-N." },
+            { q: "How old are you?", a: "I am twenty-nine years old." },
+            { q: "Where do you come from?", a: "I come from Thailand." },
+            { q: "What is your nationality?", a: "I am Thai." },
+            { q: "Do you live in a house or a flat?", a: "I live in a house." },
+            { q: "Who do you live with?", a: "I live with my husband." },
+            { q: "What is your address?", a: "I live in Bang Kapi." },
+            { q: "What is your phone number?", a: "My number is 0812345678." },
+            { q: "Do you have any children?", a: "No, I do not have children." }
+        ],
+        "Routine": [
+            { q: "What time do you get up?", a: "I get up at seven o'clock." },
+            { q: "What do you do in the morning?", a: "I have breakfast and coffee." },
+            { q: "What time do you have breakfast?", a: "I have breakfast at eight." },
+            { q: "Do you go to work?", a: "I am a homemaker." },
+            { q: "What do you do in the evening?", a: "I watch television and relax." },
+            { q: "What time do you go to bed?", a: "I go to bed at ten o'clock." },
+            { q: "Do you like to cook?", a: "Yes, I like to cook Thai food." },
+            { q: "What do you do on weekends?", a: "I visit the market and relax." },
+            { q: "Do you exercise?", a: "Yes, I walk in the park." },
+            { q: "What is your favorite part of the day?", a: "I like the morning." },
+            { q: "What time do you usually wake up?", a: "I wake up at six-thirty." },
+            { q: "Do you drink tea or coffee?", a: "I prefer coffee." },
+            { q: "What do you do after breakfast?", a: "I clean the house." },
+            { q: "Do you watch the news?", a: "Yes, I watch it in the morning." },
+            { q: "Do you go out in the afternoon?", a: "Sometimes, I go to the market." },
+            { q: "How often do you clean your house?", a: "I clean it every day." },
+            { q: "Do you listen to music?", a: "Yes, I like listening to music." },
+            { q: "Do you read books?", a: "Yes, I like reading in the evening." },
+            { q: "What time is your lunch?", a: "I have lunch at twelve o'clock." },
+            { q: "Do you go to bed early?", a: "Yes, I am usually tired at night." }
+        ],
+        "Travel": [
+            { q: "How do you travel to the city center?", a: "I usually take the train." },
+            { q: "Do you like traveling?", a: "Yes, I like traveling." },
+            { q: "How do you go to the supermarket?", a: "I go by taxi." },
+            { q: "Is the transport good in your city?", a: "Yes, it is very convenient." },
+            { q: "Have you been to London?", a: "No, not yet." },
+            { q: "How long does it take to get to the city?", a: "It takes thirty minutes." },
+            { q: "Do you prefer bus or train?", a: "I prefer the train." },
+            { q: "Do you have a driving license?", a: "No, I do not." },
+            { q: "How do you get to the airport?", a: "I go by taxi." },
+            { q: "Do you travel by boat?", a: "No, I do not." },
+            { q: "Is there a park near your house?", a: "Yes, there is a big park." },
+            { q: "Are there shops near you?", a: "Yes, there are many shops." },
+            { q: "Is your area quiet or noisy?", a: "It is very quiet." },
+            { q: "How do you go to the doctor?", a: "I go by taxi." },
+            { q: "Do you like your city?", a: "Yes, I like living here." },
+            { q: "Is the bus expensive?", a: "No, it is very cheap." },
+            { q: "How often do you use the bus?", a: "I do not use it often." },
+            { q: "Do you like walking in the city?", a: "Yes, it is nice." },
+            { q: "Is the airport far away?", a: "Yes, it is 30 minutes away." },
+            { q: "Do you prefer taxi or bus?", a: "I prefer the taxi." }
+        ],
+        "Shopping & Food": [
+            { q: "Where do you buy your food?", a: "I buy food at the supermarket." },
+            { q: "How much is this shirt?", a: "It is twenty pounds." },
+            { q: "What is your favorite food?", a: "My favorite food is Pad Thai." },
+            { q: "Do you like shopping?", a: "Yes, I like shopping for clothes." },
+            { q: "What fruit do you like?", a: "I like papaya and pineapple." },
+            { q: "Do you drink coffee?", a: "Yes, I drink coffee every morning." },
+            { q: "Is the food expensive here?", a: "No, it is cheap." },
+            { q: "What is your favorite drink?", a: "I like Thai tea." },
+            { q: "Do you go to the market?", a: "Yes, every Sunday." },
+            { q: "What do you eat for lunch?", a: "I eat rice and chicken." },
+            { q: "How many people are in your family?", a: "There are four people in my family." },
+            { q: "Do you have any brothers or sisters?", a: "Yes, I have one sister." },
+            { q: "What does your husband do?", a: "He works as an engineer." },
+            { q: "How do you spend time with family?", a: "We eat dinner together." },
+            { q: "Do you like living with family?", a: "Yes, I love my family." },
+            { q: "How old is your sister?", a: "She is twenty-five years old." },
+            { q: "Do you have any pets?", a: "No, I do not have pets." },
+            { q: "Is your family living in the UK?", a: "No, they live in Thailand." },
+            { q: "Who cooks in your family?", a: "I do most of the cooking." },
+            { q: "Do you talk to your family often?", a: "Yes, I call them every day." }
+        ],
+        "Health & Education": [
+            { q: "What do you do to keep fit?", a: "I go for a walk in the park." },
+            { q: "Do you like the weather here?", a: "It is a bit hot for me." },
+            { q: "Why do you want to live in the UK?", a: "To live with my husband." },
+            { q: "Do you speak English?", a: "I am learning." },
+            { q: "What subjects do you like?", a: "I like English." },
+            { q: "Are you healthy?", a: "Yes, I am healthy." },
+            { q: "Do you visit the doctor?", a: "Only when I am sick." },
+            { q: "What is the weather in Thailand?", a: "It is hot and sunny." },
+            { q: "Do you study every day?", a: "Yes, I practice speaking." },
+            { q: "What is your goal for this year?", a: "I want to pass my English test." },
+            { q: "Do you want to work in the UK?", a: "Yes, I would like to find a job." },
+            { q: "What kind of job do you want?", a: "I want to work in a shop." },
+            { q: "Can you use a computer?", a: "Yes, I can use a computer." },
+            { q: "Do you have any work experience?", a: "Yes, I worked at Nissan for a few years." },
+            { q: "How do you learn English?", a: "I use apps and watch videos." },
+            { q: "Do you like studying English?", a: "Yes, it is very interesting." },
+            { q: "Is English difficult for you?", a: "It is a little bit difficult." },
+            { q: "Do you study with a teacher?", a: "No, I study by myself." },
+            { q: "How many hours do you study?", a: "I study for two hours a day." },
+            { q: "Do you have a laptop?", a: "no, I dont have a laptop." }
+        ]
+    };
 
-    let currentIndex = 0, mediaRecorder, audioUrl, isRecording = false;
+    // Flattening the object to a single array for easier random picking
+    let allQuestions = [];
+    Object.values(questionBank).forEach(category => allQuestions.push(...category));
 
-    function populateNavigation() {
-        const nav = document.getElementById('topic-nav');
-        data.forEach((item, index) => {
-            const opt = document.createElement('option');
-            opt.value = index; opt.innerText = `${index + 1}. ${item.topic}`;
-            nav.appendChild(opt);
-        });
+    function loadRandomQuestion() {
+        const q = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+        document.getElementById('question').innerText = q.question;
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('feedback').innerText = "";
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = "";
+        const b = document.createElement('button');
+        b.className = 'option-btn';
+        b.innerText = "Click to show answer";
+        b.onclick = () => {
+            b.innerText = q.a;
+            document.getElementById('feedback').innerText = "Correct! ✅";
+            document.getElementById('next-btn').style.display = "block";
+            
+            // Speak the answer
+            const u = new SpeechSynthesisUtterance(q.a);
+            u.lang = 'en-GB';
+            window.speechSynthesis.speak(u);
+        };
+        container.appendChild(b);
     }
 
     function speakQuestion() { 
-        window.speechSynthesis.cancel(); 
+        window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(document.getElementById('question').innerText);
-        u.lang = 'en-GB'; u.rate = 0.9;
-        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        u.lang = 'en-GB';
         window.speechSynthesis.speak(u); 
     }
 
-    async function toggleRecording() {
-        if (!isRecording) {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            let chunks = [];
-            mediaRecorder.ondataavailable = e => chunks.push(e.data);
-            mediaRecorder.onstop = () => { audioUrl = URL.createObjectURL(new Blob(chunks)); document.getElementById('playback-btn').disabled = false; };
-            mediaRecorder.start(); isRecording = true; document.getElementById('record-btn').innerText = "🛑 Stop";
-        } else {
-            mediaRecorder.stop(); isRecording = false; document.getElementById('record-btn').innerText = "Start Recording";
-        }
-    }
-
-    function playYourVoice() { 
-        if (audioUrl) {
-            const audio = new Audio(audioUrl);
-            audio.play().catch(e => alert("Please tap again to allow audio."));
-        }
-    }
-
-    function jumpToQuestion(index) { currentIndex = parseInt(index); loadQuestion(); }
-    function nextQuestion() { currentIndex = (currentIndex + 1) % data.length; loadQuestion(); }
-
-    function loadQuestion() {
-        const q = data[currentIndex];
-        document.getElementById('question').innerText = q.question;
-        document.getElementById('topic-nav').value = currentIndex;
-        document.getElementById('next-btn').style.display = "none";
-        document.getElementById('feedback').innerText = "";
-        const container = document.getElementById('options-container');
-        container.innerHTML = "";
-        
-        q.options.forEach(opt => {
-            const b = document.createElement('button');
-            b.className = 'option-btn'; b.innerText = opt;
-            b.onclick = () => {
-                // Speech feedback on selection
-                const isCorrect = (opt === q.answer);
-                const feedbackMsg = isCorrect ? "Correct" : "Incorrect";
-                const u = new SpeechSynthesisUtterance("You selected " + opt + ". " + feedbackMsg);
-                u.lang = 'en-GB';
-                window.speechSynthesis.speak(u);
-                
-                document.getElementById('feedback').innerText = isCorrect ? "Correct! 🌟" : "Incorrect.";
-                document.getElementById('next-btn').style.display = "block";
-            };
-            container.appendChild(b);
-        });
-    }
-
-    window.onload = () => { populateNavigation(); loadQuestion(); };
+    window.onload = loadRandomQuestion;
 </script>
 </body>
 </html>
