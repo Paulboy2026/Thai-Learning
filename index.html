@@ -3,24 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UKVI A1 - 100 Question Bank</title>
+    <title>UKVI A1 Practice - 100 Questions</title>
     <style>
         :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
         .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
-        .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; }
+        .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; }
+        label { font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>UKVI A1 Practice</h1>
+    
+    <label for="topic-nav">Choose a Topic:</label>
+    <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
+        <option value="All">All Topics</option>
+        <option value="Personal">Personal</option>
+        <option value="Routine">Routine</option>
+        <option value="Travel">Travel</option>
+        <option value="Shopping & Food">Shopping & Food</option>
+        <option value="Health & Education">Health & Education</option>
+    </select>
+
     <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
     <button class="btn" onclick="speakQuestion()">🔊 Listen</button>
     <div id="options-container"></div>
     <button id="next-btn" class="btn" style="display:none; background-color: var(--accent);" onclick="loadRandomQuestion()">Next Question ➡️</button>
-    <div id="feedback" style="font-weight: bold; text-align: center;"></div>
+    <div id="feedback" style="font-weight: bold; text-align: center; margin-top: 10px;"></div>
 </div>
 
 <script>
@@ -127,13 +139,25 @@
         ]
     };
 
-    // Flattening the object to a single array for easier random picking
-    let allQuestions = [];
-    Object.values(questionBank).forEach(category => allQuestions.push(...category));
+    let currentPool = [];
+
+    function loadCategory(category) {
+        if (category === "All") {
+            currentPool = [];
+            Object.values(questionBank).forEach(cat => currentPool.push(...cat));
+        } else {
+            currentPool = questionBank[category] || [];
+        }
+        loadRandomQuestion();
+    }
 
     function loadRandomQuestion() {
-        const q = allQuestions[Math.floor(Math.random() * allQuestions.length)];
-        document.getElementById('question').innerText = q.question;
+        if (currentPool.length === 0) {
+            document.getElementById('question').innerText = "No questions available.";
+            return;
+        }
+        const q = currentPool[Math.floor(Math.random() * currentPool.length)];
+        document.getElementById('question').innerText = q.q;
         document.getElementById('next-btn').style.display = "none";
         document.getElementById('feedback').innerText = "";
         
@@ -141,13 +165,11 @@
         container.innerHTML = "";
         const b = document.createElement('button');
         b.className = 'option-btn';
-        b.innerText = "Click to show answer";
+        b.innerText = "Click to reveal answer";
         b.onclick = () => {
             b.innerText = q.a;
             document.getElementById('feedback').innerText = "Correct! ✅";
             document.getElementById('next-btn').style.display = "block";
-            
-            // Speak the answer
             const u = new SpeechSynthesisUtterance(q.a);
             u.lang = 'en-GB';
             window.speechSynthesis.speak(u);
@@ -162,7 +184,7 @@
         window.speechSynthesis.speak(u); 
     }
 
-    window.onload = loadRandomQuestion;
+    window.onload = () => loadCategory("All");
 </script>
 </body>
 </html>
