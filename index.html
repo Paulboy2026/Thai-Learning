@@ -2,200 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UKVI A1 Practice - 100 Questions</title>
+    <title>Learn Thai Practice</title>
     <style>
-        :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; }
+        :root { --primary: #FFD700; --accent: #CF142B; --bg: #f4f6f9; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
+        .btn { background: var(--primary); color: #000; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
         .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; }
         .option-btn:hover { background: #e2e8f0; }
+        .transliteration { color: #555; font-style: italic; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>UKVI A1 Practice</h1>
-    <label for="topic-nav">Choose a Topic:</label>
-    <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
-        <option value="All">All Topics</option>
-        <option value="Personal">Personal</option>
-        <option value="Routine">Routine</option>
-        <option value="Travel">Travel</option>
-        <option value="Shopping & Food">Shopping & Food</option>
-        <option value="Health & Education">Health & Education</option>
-    </select>
-
-    <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
-    <button class="btn" onclick="speakQuestion()">🔊 Listen to Question</button>
+    <h1>Thai Language Practice</h1>
+    <div id="question" style="font-size: 22px; margin: 20px 0; font-weight: bold;">Loading...</div>
+    <div id="transliteration" class="transliteration"></div>
+    <button class="btn" onclick="speakQuestion()">🔊 Listen to Thai</button>
     <div id="options-container"></div>
-    <button id="next-btn" class="btn" style="display:none; background-color: var(--accent);" onclick="loadRandomQuestion()">Next Question ➡️</button>
     <div id="feedback" style="font-weight: bold; text-align: center; margin-top: 10px;"></div>
 </div>
 
 <script>
-    const questionBank = {
-    "Personal": [
-        // Your 10 questions
-        { q: "What is your full name?", a: "My name is Nuanjan." },
-        { q: "Can you spell your first name?", a: "Yes, it is N-U-A-N-J-A-N." },
-        { q: "How old are you?", a: "I am twenty-nine years old." },
-        { q: "Where do you come from?", a: "I come from Thailand." },
-        { q: "What is your nationality?", a: "I am Thai." },
-        { q: "Do you live in a house or a flat?", a: "I live in a house." },
-        { q: "Who do you live with?", a: "I live with my husband." },
-        { q: "What is your address?", a: "I live in Bang Kapi." },
-        { q: "What is your phone number?", a: "My number is 0812345678." },
-        { q: "Do you have any children?", a: "No, I do not have children." },
-        // 10 new questions
-        { q: "Are you married?", a: "Yes, I am married." },
-        { q: "What is your husband's job?", a: "He is an engineer." },
-        { q: "Do you have a big family?", a: "No, it is a small family." },
-        { q: "What is your mother's name?", a: "Her name is [Name]." },
-        { q: "Do you have any brothers or sisters?", a: "I have one brother and one sister." },
-        { q: "Is your family in Thailand?", a: "Yes, they live in Thailand." },
-        { q: "What is your favorite color?", a: "My favorite color is blue." },
-        { q: "Are you a quiet person?", a: "Yes, I am quite quiet." },
-        { q: "Do you like meeting new people?", a: "Yes, I like making new friends." },
-        { q: "Do you have a nickname?", a: "Yes, it is Tig." }
-    ],
-    "Routine": [
-        // Your 20 questions
-        { q: "What time do you get up?", a: "I usually get up at about seven or eight o'clock." },
-        { q: "What do you do in the morning?", a: "I have breakfast and coffee." },
-        { q: "What time do you have breakfast?", a: "I usually have breakfast at eight." },
-        { q: "Do you go to work?", a: "No, I do not have a job." },
-        { q: "What do you do in the evening?", a: "I watch television and relax." },
-        { q: "What time do you go to bed?", a: "I go to bed at ten o'clock." },
-        { q: "Do you like to cook?", a: "Yes, I like to cook Thai food." },
-        { q: "What do you do on weekends?", a: "I visit the market and relax." },
-        { q: "Do you exercise?", a: "Yes, I walk in the park." },
-        { q: "What is your favorite part of the day?", a: "I like the morning." },
-        { q: "What time do you usually wake up?", a: "I wake up at eight or nine." },
-        { q: "Do you drink tea or coffee?", a: "I prefer coffee." },
-        { q: "What do you do after breakfast?", a: "I clean the house sometimes." },
-        { q: "Do you watch the news?", a: "Yes, I watch it in the morning." },
-        { q: "Do you go out in the afternoon?", a: "Sometimes, I go to the market." },
-        { q: "How often do you clean your house?", a: "I clean it two or three times a week." },
-        { q: "Do you listen to music?", a: "Yes, I like listening to music." },
-        { q: "Do you read books?", a: "not really, I prefer to use my phone to read." },
-        { q: "What time is your lunch?", a: "I have lunch at twelve o'clock." },
-        { q: "Do you go to bed early?", a: "Yes, I am usually tired at night." },
-        // 20 new questions (Weather, chores, etc)
-        { q: "Do you like sunny days?", a: "Yes, I like sunny weather." },
-        { q: "What do you do when it rains?", a: "I stay inside and watch TV." },
-        { q: "Do you use an umbrella?", a: "Yes, when it rains." },
-        { q: "Is it hot in Thailand?", a: "Yes, it is very hot." },
-        { q: "Do you like cold weather?", a: "No, I prefer warm weather." },
-        { q: "Do you wash your clothes every day?", a: "No, I wash them twice a week." },
-        { q: "Do you iron your clothes?", a: "Yes, I do it once a week." },
-        { q: "What time do you have dinner?", a: "I have dinner at seven o'clock." },
-        { q: "Do you like to stay home?", a: "Yes, I feel comfortable at home." },
-        { q: "Do you prepare your meals?", a: "Yes, I cook for my husband." },
-        { q: "Do you have a daily plan?", a: "Yes, I like to plan my day." },
-        { q: "Do you wake up early on Sundays?", a: "No, I wake up late." },
-        { q: "Do you like to walk in the morning?", a: "Yes, it is refreshing." },
-        { q: "Do you brush your teeth every morning?", a: "Yes, every morning." },
-        { q: "Do you have a mobile phone?", a: "Yes, I have an iPhone." },
-        { q: "Do you charge your phone at night?", a: "Yes, every night." },
-        { q: "Do you like taking photos?", a: "Yes, I like taking photos of interesting things." },
-        { q: "What do you do before you go to sleep?", a: "I check my phone messages." },
-        { q: "Are you a busy person?", a: "Sometimes, when I have chores." },
-        { q: "Do you like watching movies?", a: "Yes, I like watching movies." }
-    ],
-    "Travel": [
-        // Your 20 questions...
-        // ... (Keep your original Travel questions) ...
-        // 20 new Travel questions
-        { q: "Is the train station far?", a: "No, it is very close." },
-        { q: "Do you like fast trains?", a: "Yes, they are very quick." },
-        { q: "Have you ever traveled by plane?", a: "Yes, I have." },
-        { q: "Do you like to sit by the window?", a: "Yes, I like looking outside." },
-        { q: "Is the airport busy?", a: "Yes, it is always busy." },
-        { q: "Do you buy tickets at the station?", a: "Yes, I buy them there." },
-        { q: "Do you have a passport?", a: "Yes, I have a Thai passport." },
-        { q: "Do you like to travel with friends?", a: "Yes, it is more fun." },
-        { q: "Is there a bus stop near you?", a: "Yes, just a short walk away." },
-        { q: "Do you wear a seatbelt in a taxi?", a: "Yes, I always wear it." },
-        { q: "Do you like visiting new places?", a: "Yes, I find it exciting." },
-        { q: "Have you been to a beach?", a: "Yes, the beach is beautiful." },
-        { q: "Do you use Google Maps?", a: "Yes, it helps me find the way." },
-        { q: "Do you like to walk in the city center?", a: "Yes, there are many nice shops." },
-        { q: "Is the transport here expensive?", a: "No, it is affordable." },
-        { q: "Do you take a bag when you travel?", a: "Yes, I always take a handbag." },
-        { q: "Have you ever lost your way?", a: "No, I am careful." },
-        { q: "Do you like traveling on weekends?", a: "Yes, that is my free time." },
-        { q: "Is there a lot of traffic here?", a: "Yes, especially in the morning." },
-        { q: "Would you like to travel to other countries?", a: "Yes, I would love to travel more." }
-    ],
-    "Shopping & Food": [
-        // ... (Keep your original Shopping questions) ...
-        // 20 new Shopping & Food questions
-        { q: "Do you like spicy food?", a: "Yes, I love spicy Thai food." },
-        { q: "Do you eat fruit every day?", a: "Yes, I eat fruit every day." },
-        { q: "Do you like milk in your coffee?", a: "No, I drink it black." },
-        { q: "Do you go to the supermarket often?", a: "Yes, I go once a week." },
-        { q: "Is the mall open on Sundays?", a: "Yes, it is open every day." },
-        { q: "Do you like buying shoes?", a: "Yes, I love buying shoes." },
-        { q: "Do you use a credit card?", a: "No, I dont have one." },
-        { q: "Is your favorite food healthy?", a: "Yes, it has many vegetables." },
-        { q: "Do you like to eat salad?", a: "Yes, I love Som Tam." },
-        { q: "Do you drink enough water?", a: "Yes, I drink a lot of water." },
-        { q: "Do you like Thai tea?", a: "Yes, it is very delicious." },
-        { q: "Do you cook for your husband?", a: "Yes, I cook dinner for him." },
-        { q: "Is the vegetable market cheap?", a: "Yes, it is cheaper than the supermarket." },
-        { q: "Do you like chocolate?", a: "Yes, but I don't eat it often." },
-        { q: "Do you eat fish?", a: "Yes, I like grilled fish." },
-        { q: "Do you buy clothes online?", a: "Sometimes, it is very convenient." },
-        { q: "Do you compare prices when shopping?", a: "Yes, I always check the price." },
-        { q: "Do you like to eat at restaurants?", a: "Yes, on special occasions." },
-        { q: "Are you a good cook?", a: "I think so, my husband likes my food." },
-        { q: "Do you like breakfast cereal?", a: "No, I prefer rice." }
-    ],
-    "Health & Education": [
-        // ... (Keep your original Health questions) ...
-        // 20 new Health & Education questions
-        { q: "Do you like to study English?", a: "Yes, it is important for me." },
-        { q: "Do you have a dictionary?", a: "Yes, I have one on my phone." },
-        { q: "Do you watch English programs?", a: "Yes, I watch them to learn." },
-        { q: "Do you like to practice speaking?", a: "Yes, I talk to myself sometimes." },
-        { q: "Is health important to you?", a: "Yes, it is the most important thing." },
-        { q: "Do you visit the dentist?", a: "Yes, once a year." },
-        { q: "Do you take vitamins?", a: "no, I prefer to eat fresh fruit." },
-        { q: "Do you like to walk in nature?", a: "Yes, it makes me feel healthy." },
-        { q: "Is English difficult to learn?", a: "Yes, but I try my best." },
-        { q: "Do you want to get a job in the future?", a: "Yes, I would like to work." },
-        { q: "Can you use a laptop?", a: "Yes, I can use it for studying." },
-        { q: "Do you have a favorite teacher?", a: "I learn mostly from YouTube videos." },
-        { q: "Do you feel tired after studying?", a: "Sometimes, but it is worth it." },
-        { q: "Do you like to read magazines?", a: "Yes, they are easy to read." },
-        { q: "Do you think English is useful?", a: "Yes, for living in the UK." },
-        { q: "Do you do exercise at home?", a: "Yes, I do some light exercises." },
-        { q: "Do you ever have a headache?", a: "Sometimes, when I am tired." },
-        { q: "Do you like to learn new skills?", a: "Yes, I enjoy learning." },
-        { q: "Do you drink water when studying?", a: "Yes, it helps me stay focused." },
-        { q: "Do you want to pass your exam?", a: "Yes, that is my main goal." }
-    ]
-};
+    const questionBank = [
+        { q: "สวัสดีครับ/ค่ะ", t: "Sawatdee krub/ka", a: "Hello" },
+        { q: "คุณชื่ออะไรครับ/ค่ะ?", t: "Khun cheu arai krub/ka?", a: "What is your name?" },
+        { q: "สบายดีไหม?", t: "Sabai dee mai?", a: "How are you?" },
+        { q: "ขอบคุณครับ/ค่ะ", t: "Khob khun krub/ka", a: "Thank you" },
+        { q: "ห้องน้ำอยู่ที่ไหน?", t: "Hong nam yoo tee nai?", a: "Where is the toilet?" },
+        { q: "นี่ราคาเท่าไหร่?", t: "Nee ra-ka tao-rai?", a: "How much is this?" },
+        { q: "ขอโทษครับ/ค่ะ", t: "Kor tod krub/ka", a: "Sorry / Excuse me" },
+        { q: "ผม/ฉันหิวข้าว", t: "Phom/Chan hiu khao", a: "I am hungry" },
+        { q: "คุณพูดภาษาอังกฤษได้ไหม?", t: "Khun pood pasa ang-krit dai mai?", a: "Can you speak English?" },
+        { q: "ไปที่นี่ได้ไหม?", t: "Pai tee nee dai mai?", a: "Can you go to this place?" }
+    ];
 
-    let currentPool = [];
     let currentQuestion = null;
 
-    function loadCategory(category) {
-        if (category === "All") {
-            currentPool = [].concat(...Object.values(questionBank));
-        } else {
-            currentPool = questionBank[category] || [];
-        }
-        loadRandomQuestion();
-    }
-
     function loadRandomQuestion() {
-        if (currentPool.length === 0) return;
-        currentQuestion = currentPool[Math.floor(Math.random() * currentPool.length)];
+        currentQuestion = questionBank[Math.floor(Math.random() * questionBank.length)];
         document.getElementById('question').innerText = currentQuestion.q;
-        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('transliteration').innerText = "(" + currentQuestion.t + ")";
         document.getElementById('feedback').innerText = "";
         
         const container = document.getElementById('options-container');
@@ -203,8 +51,8 @@
         
         let options = [currentQuestion.a];
         while (options.length < 4) {
-            let randomQ = currentPool[Math.floor(Math.random() * currentPool.length)];
-            if (!options.includes(randomQ.a)) options.push(randomQ.a);
+            let randomOpt = questionBank[Math.floor(Math.random() * questionBank.length)].a;
+            if (!options.includes(randomOpt)) options.push(randomOpt);
         }
         options.sort(() => Math.random() - 0.5);
 
@@ -215,10 +63,7 @@
             b.onclick = () => {
                 if (opt === currentQuestion.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
-                    const u = new SpeechSynthesisUtterance(currentQuestion.a);
-                    u.lang = 'en-GB';
-                    window.speechSynthesis.speak(u);
-                    document.getElementById('next-btn').style.display = "block";
+                    setTimeout(loadRandomQuestion, 1500);
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
                 }
@@ -230,11 +75,11 @@
     function speakQuestion() { 
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(currentQuestion.q);
-        u.lang = 'en-GB';
+        u.lang = 'th-TH'; // Sets the voice to Thai
         window.speechSynthesis.speak(u); 
     }
 
-    window.onload = () => setTimeout(() => loadCategory("All"), 100);
+    window.onload = loadRandomQuestion;
 </script>
 </body>
 </html>
