@@ -2,57 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Learn Thai Practice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Thai Learning App</title>
     <style>
-        :root { --primary: #FFD700; --accent: #CF142B; --bg: #f4f6f9; }
-        body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 600px; width: 100%; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
-        .btn { background: var(--primary); color: #000; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
-        .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; }
-        .option-btn:hover { background: #e2e8f0; }
-        .transliteration { color: #555; font-style: italic; margin-top: 5px; }
+        :root { --primary: #FFD700; --bg: #f4f6f9; }
+        body { font-family: sans-serif; background-color: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 500px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn { background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; font-size: 16px; }
+        #question { font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; }
+        #transliteration { color: #555; text-align: center; margin-bottom: 15px; }
+        #feedback { font-weight: bold; text-align: center; height: 20px; margin: 10px 0; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Thai Language Practice</h1>
-    <div id="question" style="font-size: 22px; margin: 20px 0; font-weight: bold;">Loading...</div>
-    <div id="transliteration" class="transliteration"></div>
-    <button class="btn" onclick="speakQuestion()">🔊 Listen to Thai</button>
+    <select id="cat-nav" onchange="loadRandomQuestion()" style="width: 100%; padding: 10px; border-radius: 5px;">
+        <option value="Phrases">Basic Phrases</option>
+        <option value="Numbers">Numbers 1-100</option>
+    </select>
+
+    <div id="question">Loading...</div>
+    <div id="transliteration"></div>
+    <button class="btn" onclick="speakThai()">🔊 Listen</button>
     <div id="options-container"></div>
-    <div id="feedback" style="font-weight: bold; text-align: center; margin-top: 10px;"></div>
+    <div id="feedback"></div>
 </div>
 
 <script>
-    const questionBank = [
-        { q: "สวัสดีครับ/ค่ะ", t: "Sawatdee krub/ka", a: "Hello" },
-        { q: "คุณชื่ออะไรครับ/ค่ะ?", t: "Khun cheu arai krub/ka?", a: "What is your name?" },
-        { q: "สบายดีไหม?", t: "Sabai dee mai?", a: "How are you?" },
-        { q: "ขอบคุณครับ/ค่ะ", t: "Khob khun krub/ka", a: "Thank you" },
-        { q: "ห้องน้ำอยู่ที่ไหน?", t: "Hong nam yoo tee nai?", a: "Where is the toilet?" },
-        { q: "นี่ราคาเท่าไหร่?", t: "Nee ra-ka tao-rai?", a: "How much is this?" },
-        { q: "ขอโทษครับ/ค่ะ", t: "Kor tod krub/ka", a: "Sorry / Excuse me" },
-        { q: "ผม/ฉันหิวข้าว", t: "Phom/Chan hiu khao", a: "I am hungry" },
-        { q: "คุณพูดภาษาอังกฤษได้ไหม?", t: "Khun pood pasa ang-krit dai mai?", a: "Can you speak English?" },
-        { q: "ไปที่นี่ได้ไหม?", t: "Pai tee nee dai mai?", a: "Can you go to this place?" }
-    ];
+    const data = {
+        "Phrases": [
+            { q: "สวัสดี", t: "Sawatdee", a: "Hello" },
+            { q: "ขอบคุณ", t: "Khob khun", a: "Thank you" },
+            { q: "ห้องน้ำอยู่ที่ไหน", t: "Hong nam yoo tee nai", a: "Where is the toilet" }
+        ],
+        "Numbers": Array.from({length: 100}, (_, i) => ({
+            q: (i + 1).toString(), t: "Number " + (i + 1), a: (i + 1).toString()
+        }))
+    };
 
-    let currentQuestion = null;
+    let current = null;
 
     function loadRandomQuestion() {
-        currentQuestion = questionBank[Math.floor(Math.random() * questionBank.length)];
-        document.getElementById('question').innerText = currentQuestion.q;
-        document.getElementById('transliteration').innerText = "(" + currentQuestion.t + ")";
+        const cat = document.getElementById('cat-nav').value;
+        const pool = data[cat];
+        current = pool[Math.floor(Math.random() * pool.length)];
+        
+        document.getElementById('question').innerText = current.q;
+        document.getElementById('transliteration').innerText = current.t;
         document.getElementById('feedback').innerText = "";
         
         const container = document.getElementById('options-container');
         container.innerHTML = "";
         
-        let options = [currentQuestion.a];
+        let options = [current.a];
         while (options.length < 4) {
-            let randomOpt = questionBank[Math.floor(Math.random() * questionBank.length)].a;
-            if (!options.includes(randomOpt)) options.push(randomOpt);
+            let rand = pool[Math.floor(Math.random() * pool.length)].a;
+            if (!options.includes(rand)) options.push(rand);
         }
         options.sort(() => Math.random() - 0.5);
 
@@ -61,9 +68,9 @@
             b.className = 'option-btn';
             b.innerText = opt;
             b.onclick = () => {
-                if (opt === currentQuestion.a) {
+                if (opt === current.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
-                    setTimeout(loadRandomQuestion, 1500);
+                    setTimeout(loadRandomQuestion, 1000);
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
                 }
@@ -72,14 +79,13 @@
         });
     }
 
-    function speakQuestion() { 
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(currentQuestion.q);
-        u.lang = 'th-TH'; // Sets the voice to Thai
-        window.speechSynthesis.speak(u); 
+    function speakThai() {
+        const u = new SpeechSynthesisUtterance(current.q);
+        u.lang = 'th-TH';
+        window.speechSynthesis.speak(u);
     }
 
-    window.onload = loadRandomQuestion;
+    loadRandomQuestion();
 </script>
 </body>
 </html>
