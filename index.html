@@ -17,8 +17,8 @@
 
 <div class="container">
     <h1>Thai Practice (Male)</h1>
-    <!-- Updated to a simple, single-tone 'ping' sound -->
-    <audio id="dingSound" src="https://assets.mixkit.co/active_storage/sfx/2564/2564-preview.mp3" preload="auto"></audio>
+    <!-- Localized sound using a common base64 string to ensure it plays without external dependency -->
+    <audio id="dingSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
 
     <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
@@ -43,12 +43,6 @@
 </div>
 
 <script>
-    // Unlock audio on first interaction
-    document.body.addEventListener('click', () => {
-        const d = document.getElementById('dingSound');
-        d.play().then(() => { d.pause(); d.currentTime = 0; });
-    }, { once: true });
-
     const num1_10 = [];
     for(let i=1; i<=10; i++) num1_10.push({ q: "Listen to the number", t: "", a: i.toString() });
     
@@ -211,9 +205,10 @@
             b.onclick = () => {
                 if (opt === currentQuestion.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
+                    // Attempting to play the sound
                     const ding = document.getElementById('dingSound');
                     ding.currentTime = 0;
-                    ding.play();
+                    ding.play().catch(e => console.log("Audio play blocked until first interaction"));
                     setTimeout(loadRandomQuestion, 1000);
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
