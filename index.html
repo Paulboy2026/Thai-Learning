@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Practice App</title>
+    <title>Thai Practice App (Expanded)</title>
     <style>
         :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -16,10 +16,13 @@
 <body>
 
 <div class="container">
-    <h1>Thai Practice</h1>
+    <h1>Thai Practice (Male)</h1>
     <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
         <option value="Basics">Basics</option>
+        <option value="Food">Food & Meat</option>
+        <option value="Fruit">Fruit</option>
+        <option value="Weather">Weather</option>
         <option value="Numbers">Numbers 1-100</option>
     </select>
 
@@ -33,10 +36,25 @@
 <script>
     const questionBank = {
         "Basics": [
-            { q: "สวัสดีครับ/ค่ะ", t: "Sawatdee", a: "Hello" },
-            { q: "ขอบคุณ", t: "Khob khun", a: "Thank you" },
-            { q: "ห้องน้ำอยู่ที่ไหน", t: "Hong nam yoo tee nai", a: "Where is the toilet" },
-            { q: "ราคาเท่าไหร่", t: "Ra-ka tao-rai", a: "How much is it" }
+            { q: "สวัสดีครับ", t: "Sawatdee khub", a: "Hello" },
+            { q: "ขอบคุณครับ", t: "Khob khun khub", a: "Thank you" },
+            { q: "ห้องน้ำอยู่ที่ไหนครับ", t: "Hong nam yoo tee nai khub", a: "Where is the toilet" },
+            { q: "ราคาเท่าไหร่ครับ", t: "Ra-ka tao-rai khub", a: "How much is it" }
+        ],
+        "Food": [
+            { q: "ผมอยากทานไก่ครับ", t: "Pom yak tan gai khub", a: "I want to eat chicken" },
+            { q: "ผมอยากทานเนื้อวัวครับ", t: "Pom yak tan nuea wua khub", a: "I want to eat beef" },
+            { q: "ผมอยากทานหมูครับ", t: "Pom yak tan moo khub", a: "I want to eat pork" }
+        ],
+        "Fruit": [
+            { q: "ผมชอบทานมะละกอครับ", t: "Pom chob tan ma-la-kor khub", a: "I like to eat papaya" },
+            { q: "ผมชอบทานสับปะรดครับ", t: "Pom chob tan sap-pa-rod khub", a: "I like to eat pineapple" },
+            { q: "ผมชอบทานขนุนครับ", t: "Pom chob tan ka-noon khub", a: "I like to eat jackfruit" }
+        ],
+        "Weather": [
+            { q: "วันนี้อากาศร้อนครับ", t: "Wan-nee a-kat ron khub", a: "It is hot today" },
+            { q: "วันนี้อากาศเย็นครับ", t: "Wan-nee a-kat yen khub", a: "It is cold today" },
+            { q: "ฝนกำลังจะตกครับ", t: "Fon kam-lang ja tok khub", a: "It is going to rain" }
         ],
         "Numbers": Array.from({length: 100}, (_, i) => ({
             q: (i + 1).toString(), t: "Number " + (i + 1), a: (i + 1).toString()
@@ -88,7 +106,7 @@
     function speakQuestion() { 
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(currentQuestion.q);
-        u.lang = 'th-TH'; // Use Thai language voice
+        u.lang = 'th-TH';
         window.speechSynthesis.speak(u); 
     }
 
