@@ -49,7 +49,7 @@
             { q: "ผมหิวครับ", t: "Pom hew khub", a: "I'm hungry" },
             { q: "คุณเหนื่อยไหมครับ", t: "Khun neuay mai khub", a: "Are you tired?" },
             { q: "ผมเหนื่อยครับ", t: "Pom neuay khub", a: "I'm tired" },
-            { q: "คุณสบายดีไหมครับ", t: "Khun sa-bai-dee mai khub", a: "How are you?" },
+            { q: "สบายดีไหมครับ", t: "Sa-bai-dee mai khub", a: "How are you?" },
             { q: "สบายดีครับ ขอบคุณครับ", t: "Sa-bai-dee khub, khob khun khub", a: "I'm good, thank you" }
         ],
         "Food": [
@@ -82,32 +82,25 @@
     let currentQuestion = null;
 
     function loadCategory(category) {
-        // Cancel ongoing audio
         window.speechSynthesis.cancel();
-        // Clear feedback immediately
-        document.getElementById('feedback').innerText = "";
-        
-        // Add a slight delay to allow the browser to clear the UI thread
-        setTimeout(() => {
-            if (category === "All") {
-                currentPool = [].concat(...Object.values(questionBank));
-            } else {
-                currentPool = questionBank[category] || [];
-            }
-            loadRandomQuestion();
-        }, 50);
+        if (category === "All") {
+            currentPool = [].concat(...Object.values(questionBank));
+        } else {
+            currentPool = questionBank[category] || [];
+        }
+        loadRandomQuestion();
     }
 
     function loadRandomQuestion() {
         if (currentPool.length === 0) return;
-        
-        const container = document.getElementById('options-container');
-        container.innerHTML = "";
-        
         currentQuestion = currentPool[Math.floor(Math.random() * currentPool.length)];
         
         document.getElementById('question').innerText = currentQuestion.q;
         document.getElementById('transliteration').innerText = currentQuestion.t;
+        document.getElementById('feedback').innerText = "";
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = "";
         
         let options = [currentQuestion.a];
         while (options.length < 4) {
@@ -123,7 +116,7 @@
             b.onclick = () => {
                 if (opt === currentQuestion.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
-                    setTimeout(loadRandomQuestion, 800);
+                    loadRandomQuestion();
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
                 }
@@ -139,7 +132,7 @@
         window.speechSynthesis.speak(u); 
     }
 
-    window.onload = () => loadCategory("All");
+    window.onload = () => setTimeout(() => loadCategory("All"), 100);
 </script>
 </body>
 </html>
