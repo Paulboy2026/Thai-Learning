@@ -5,22 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thai Practice App</title>
     <style>
-        :root { --primary: #00247D; --bg: #f4f6f9; }
+        :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
         .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
         .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; }
-        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; z-index: 100; }
+        .option-btn:hover { background: #e2e8f0; }
     </style>
 </head>
 <body>
 
-<div id="start-overlay" onclick="this.style.display='none'">Click anywhere to enable sound and start</div>
-
 <div class="container">
     <h1>Thai Practice (Male)</h1>
-    <audio id="dingSound" src="https://actions.google.com/sounds/v1/ui/button_toggle.ogg"></audio>
+    <!-- Updated to a simple, single-tone 'ping' sound -->
+    <audio id="dingSound" src="https://assets.mixkit.co/active_storage/sfx/2564/2564-preview.mp3" preload="auto"></audio>
 
+    <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
         <option value="All">All Topics</option>
         <option value="Basics">Basics</option>
@@ -35,7 +35,7 @@
         <option value="Weather">Weather</option>
     </select>
 
-    <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Select a topic to begin.</div>
+    <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
     <div id="transliteration" style="font-style: italic; color: #555; margin-bottom: 10px;"></div>
     <button class="btn" onclick="speakQuestion()">🔊 Listen to Thai</button>
     <div id="options-container"></div>
@@ -43,14 +43,141 @@
 </div>
 
 <script>
-    const ding = document.getElementById('dingSound');
-    const questionBank = { /* ... (Your full question bank remains here) ... */ };
+    // Unlock audio on first interaction
+    document.body.addEventListener('click', () => {
+        const d = document.getElementById('dingSound');
+        d.play().then(() => { d.pause(); d.currentTime = 0; });
+    }, { once: true });
 
-    // Function to play sound safely
-    function playDing() {
-        ding.currentTime = 0;
-        ding.play().catch(e => console.log("Audio play prevented:", e));
-    }
+    const num1_10 = [];
+    for(let i=1; i<=10; i++) num1_10.push({ q: "Listen to the number", t: "", a: i.toString() });
+    
+    const num10_100 = [];
+    for(let i=10; i<=100; i++) num10_100.push({ q: "Listen to the number", t: "", a: i.toString() });
+
+    const questionBank = {
+        "Basics": [
+            { q: "สวัสดีครับ", t: "Sawatdee khub", a: "Hello" },
+            { q: "ขอบคุณครับ", t: "Khob khun khub", a: "Thank you" }
+        ],
+        "General": [
+            { q: "ใช่", t: "chai", a: "Yes" },
+            { q: "ไม่ใช่", t: "mai chai", a: "No" },
+            { q: "ได้", t: "dai", a: "Can" },
+            { q: "ไม่ได้", t: "mai dai", a: "Cannot" },
+            { q: "ไม่เป็นไร", t: "mai pen rai", a: "Never mind" },
+            { q: "เข้าใจไหม", t: "kow jai mai", a: "Do you understand?" },
+            { q: "โชคดี", t: "chok dee", a: "Good luck" },
+            { q: "นิดหน่อย", t: "nit noi", a: "A little bit" },
+            { q: "เล็ก", t: "lek", a: "Small" },
+            { q: "ใหญ่", t: "yiy", a: "Large/Big" },
+            { q: "มาก", t: "mak", a: "A lot" },
+            { q: "เขา", t: "cow", a: "He/She" },
+            { q: "เรา", t: "rao", a: "We" },
+            { q: "คุณ", t: "khun", a: "You" },
+            { q: "สี", t: "see", a: "Colour" },
+            { q: "คุณชอบสีอะไร", t: "khun chob see arai", a: "What colour do you like?" },
+            { q: "ผมชอบสี", t: "pom chob see", a: "I like..." },
+            { q: "ไม่ได้", t: "mhai-dai", a: "Can't (polite)" },
+            { q: "อะไรนะ", t: "arai-na", a: "Beg your pardon?" },
+            { q: "พูดภาษาอังกฤษได้ไหม", t: "pood paasaa anggrit dai mai", a: "Can you speak English?" },
+            { q: "ต้องการ", t: "dong-gaan", a: "Want (formal)" },
+            { q: "ผม", t: "Pom", a: "I (male)" },
+            { q: "ดีมาก", t: "dee-maak", a: "Very good!" },
+            { q: "อยาก", t: "yaak", a: "Want to (before verb)" },
+            { q: "เมื่อวาน", t: "mlawan", a: "Yesterday" },
+            { q: "วันนี้", t: "One nee", a: "Today" },
+            { q: "ตอนนี้", t: "On nee", a: "Now" },
+            { q: "พรุ่งนี้", t: "Pung nee", a: "Tomorrow" }
+        ],
+        "Travel": [
+            { q: "สนามบิน", t: "sanaam bin", a: "Airport" },
+            { q: "ห้องน้ำ", t: "hong nam", a: "Toilet" },
+            { q: "ห้องน้ำอยู่ที่ไหน", t: "hong-nam yoo-nai", a: "Where is the toilet?" },
+            { q: "ไปที่", t: "pai tee", a: "Go to" },
+            { q: "ใช้มิเตอร์ไหมครับ", t: "chai metah... mai khub", a: "Do you use a meter (taxi)?" },
+            { q: "ตรงไปครับ", t: "drong pai khub", a: "Go straight" },
+            { q: "เลี้ยวขวาครับ", t: "liao kwaa khub", a: "Turn right" },
+            { q: "เลี้ยวซ้ายครับ", t: "liao sai khub", a: "Turn left" },
+            { q: "จอดที่นี่ครับ", t: "jot tee-nee khub", a: "Stop here" },
+            { q: "กรุงเทพฯ", t: "krung-thep", a: "Bangkok" },
+            { q: "นี่เท่าไร", t: "un-nee tao-rai khub", a: "This one how much?" },
+            { q: "ลดได้ไหมครับ", t: "lot dai mai khub", a: "Can you give me a discount?" }
+        ],
+        "Num1_10": num1_10,
+        "Num10_100": num10_100,
+        "AllNumbers": num1_10.concat(num10_100),
+        "Actions": [
+            { q: "ตื่นนอนครับ", t: "Tuen-non khub", a: "Wake up" },
+            { q: "ผมรักคุณครับ", t: "Pom rak khun khub", a: "I love you" },
+            { q: "ผมรักคุณเช่นกันครับ", t: "Pom rak khun chen-gan khub", a: "I love you too" },
+            { q: "คุณหิวน้ำไหมครับ", t: "Khun hew-nam mai khub", a: "Are you thirsty?" },
+            { q: "คุณหิวไหมครับ", t: "Khun hew mai khub", a: "Are you hungry?" },
+            { q: "ผมหิวครับ", t: "Pom hew khub", a: "I'm hungry" },
+            { q: "คุณเหนื่อยไหมครับ", t: "Khun neuay mai khub", a: "Are you tired?" },
+            { q: "ผมเหนื่อยครับ", t: "Pom neuay khub", a: "I'm tired" },
+            { q: "สบายดีไหมครับ", t: "Sa-bai-dee mai khub", a: "How are you?" },
+            { q: "สบายดีครับ ขอบคุณครับ", t: "Sa-bai-dee khub, khob khun khub", a: "I'm good, thank you" },
+            { q: "ว่ายน้ำ", t: "wyenam", a: "Swimming" },
+            { q: "ไปว่ายน้ำกันเลย", t: "Pye wynam ganlooey", a: "Lets go swimming" }
+        ],
+        "FoodDrink": [
+            { q: "ไก่", t: "Gai", a: "Chicken" },
+            { q: "ไข่ไก่", t: "Khai Kai", a: "Chicken Eggs" },
+            { q: "เนื้อวัว", t: "Nuea", a: "Beef" },
+            { q: "หมู", t: "Mhoo", a: "Pork" },
+            { q: "ปลา", t: "Plaa", a: "Fish" },
+            { q: "กุ้งใหญ่", t: "Koong heng", a: "Large Prawns" },
+            { q: "ผัดกะเพราเนื้อ", t: "Pad kaprow nuea", a: "Beef stir-fry with basil" },
+            { q: "อยากกะเพราเนื้อ", t: "Ow kaprow Neea", a: "I want krapow beef" },
+            { q: "ก๋วยเตี๋ยวน้ำ", t: "Kuay tiew naam", a: "Noodle soup" },
+            { q: "ก๋วยเตี๋ยวน้ำแบบไทย", t: "Wye jam naam koon", a: "Thai noodle soup" },
+            { q: "ข้าวผัด", t: "Khao pad", a: "Fried rice" },
+            { q: "น้ำ", t: "naam", a: "Water" },
+            { q: "น้ำแข็ง", t: "naam keng", a: "Ice" },
+            { q: "เบียร์ช้าง", t: "bia Chang", a: "Beer Chang" },
+            { q: "อยากเบียร์ช้าง 3 ขวด", t: "Ow beer chang sam kwad", a: "I want 3 beers" },
+            { q: "กะหรี่ปั๊บไก่", t: "Galee pib sai ghai", a: "Chicken pastie" },
+            { q: "เผ็ด", t: "phet", a: "Spicy" },
+            { q: "เผ็ดมาก", t: "phet mak", a: "Really spicy" },
+            { q: "ไม่เผ็ด", t: "mai phet", a: "Not spicy" },
+            { q: "เผ็ดนิดหน่อย", t: "phet nit nawy", a: "A little bit spicy" },
+            { q: "ใส่ถุง", t: "Sai Tung", a: "Take away" },
+            { q: "แพง", t: "pang", a: "Expensive" },
+            { q: "แพงมาก", t: "pang mak", a: "Very expensive" },
+            { q: "ถูก", t: "took", a: "Cheap" },
+            { q: "อยากกาแฟ", t: "aow ga-fae", a: "Want coffee" },
+            { q: "เอาส้มตำครับ", t: "aow som-tam khub", a: "I want som tam" },
+            { q: "ขอ...", t: "khor / aow... khub", a: "Give me (food name)" },
+            { q: "ขอน้ำเปล่าหน่อยครับ", t: "khor nam-plao noi khub", a: "Give me water" }
+        ],
+        "Fruit": [
+            { q: "มะม่วง", t: "Ma-muang", a: "Mango" },
+            { q: "สับปะรด", t: "Sap-pa-rod", a: "Pineapple" },
+            { q: "เงาะ", t: "Ngao", a: "Rambutan" },
+            { q: "แตงโม", t: "Taeng-mo", a: "Watermelon" },
+            { q: "มะละกอ", t: "Ma-la-kor", a: "Papaya" },
+            { q: "มะพร้าว", t: "Ma-phraw", a: "Coconut" },
+            { q: "กล้วย", t: "Gluay", a: "Banana" },
+            { q: "ขนุน", t: "Kha-nun", a: "Jackfruit" },
+            { q: "มะนาว", t: "Ma-nao", a: "Lime" },
+            { q: "มะนาวสีเหลือง", t: "Ma-nao-see-luang", a: "Lemon" },
+            { q: "ลิ้นจี่", t: "Lin-chee", a: "Lychee" },
+            { q: "ส้มโอ", t: "Som-O", a: "Pomelo" }
+        ],
+        "Weather": [
+            { q: "ร้อน", t: "Ron", a: "Hot" },
+            { q: "เย็น", t: "Yen", a: "Cold/Cool" },
+            { q: "หนาว", t: "Nao", a: "Cold" },
+            { q: "ฝนตก", t: "Fon tok", a: "Raining" },
+            { q: "ลมแรง", t: "Lom raeng", a: "Windy" },
+            { q: "ฝนกำลังจะตก", t: "Fon kam-lang ja tok", a: "It's going to rain" },
+            { q: "ข้างนอกร้อน", t: "Khang-nok ron", a: "It's hot outside" }
+        ]
+    };
+
+    let currentPool = [];
+    let currentQuestion = null;
 
     function loadCategory(category) {
         window.speechSynthesis.cancel();
@@ -69,9 +196,11 @@
         container.innerHTML = "";
         
         let options = [currentQuestion.a];
-        while (options.length < 4) {
+        let attempts = 0;
+        while (options.length < 4 && attempts < 20) {
             let r = currentPool[Math.floor(Math.random() * currentPool.length)].a;
             if (!options.includes(r)) options.push(r);
+            attempts++;
         }
         
         options.sort(() => Math.random() - 0.5);
@@ -82,96 +211,9 @@
             b.onclick = () => {
                 if (opt === currentQuestion.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
-                    playDing();
-                    setTimeout(loadRandomQuestion, 1000);
-                } else {
-                    document.getElementById('feedback').innerText = "Try again! ❌";
-                }
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Practice App</title>
-    <style>
-        :root { --primary: #00247D; --bg: #f4f6f9; }
-        body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 600px; width: 100%; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; }
-        .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; }
-        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; z-index: 100; }
-    </style>
-</head>
-<body>
-
-<div id="start-overlay" onclick="this.style.display='none'">Click anywhere to enable sound and start</div>
-
-<div class="container">
-    <h1>Thai Practice (Male)</h1>
-    <audio id="dingSound" src="https://actions.google.com/sounds/v1/ui/button_toggle.ogg"></audio>
-
-    <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
-        <option value="All">All Topics</option>
-        <option value="Basics">Basics</option>
-        <option value="General">General</option>
-        <option value="Travel">Travel</option>
-        <option value="Num1_10">Numbers 1-10</option>
-        <option value="Num10_100">Numbers 10-100</option>
-        <option value="AllNumbers">All Numbers</option>
-        <option value="Actions">Actions & Feelings</option>
-        <option value="FoodDrink">Food & Drink</option>
-        <option value="Fruit">Fruit</option>
-        <option value="Weather">Weather</option>
-    </select>
-
-    <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Select a topic to begin.</div>
-    <div id="transliteration" style="font-style: italic; color: #555; margin-bottom: 10px;"></div>
-    <button class="btn" onclick="speakQuestion()">🔊 Listen to Thai</button>
-    <div id="options-container"></div>
-    <div id="feedback" style="font-weight: bold; text-align: center; margin-top: 10px;"></div>
-</div>
-
-<script>
-    const ding = document.getElementById('dingSound');
-    const questionBank = { /* ... (Your full question bank remains here) ... */ };
-
-    // Function to play sound safely
-    function playDing() {
-        ding.currentTime = 0;
-        ding.play().catch(e => console.log("Audio play prevented:", e));
-    }
-
-    function loadCategory(category) {
-        window.speechSynthesis.cancel();
-        currentPool = (category === "All") ? [].concat(...Object.values(questionBank)) : questionBank[category] || [];
-        loadRandomQuestion();
-    }
-
-    function loadRandomQuestion() {
-        if (currentPool.length === 0) return;
-        currentQuestion = currentPool[Math.floor(Math.random() * currentPool.length)];
-        document.getElementById('question').innerText = currentQuestion.q;
-        document.getElementById('transliteration').innerText = currentQuestion.t;
-        document.getElementById('feedback').innerText = "";
-        
-        const container = document.getElementById('options-container');
-        container.innerHTML = "";
-        
-        let options = [currentQuestion.a];
-        while (options.length < 4) {
-            let r = currentPool[Math.floor(Math.random() * currentPool.length)].a;
-            if (!options.includes(r)) options.push(r);
-        }
-        
-        options.sort(() => Math.random() - 0.5);
-        options.forEach(opt => {
-            const b = document.createElement('button');
-            b.className = 'option-btn';
-            b.innerText = opt;
-            b.onclick = () => {
-                if (opt === currentQuestion.a) {
-                    document.getElementById('feedback').innerText = "Correct! ✅";
-                    playDing();
+                    const ding = document.getElementById('dingSound');
+                    ding.currentTime = 0;
+                    ding.play();
                     setTimeout(loadRandomQuestion, 1000);
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
@@ -183,23 +225,13 @@
 
     function speakQuestion() { 
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(currentQuestion.q === "Listen to the number" ? currentQuestion.a : currentQuestion.q);
+        const textToSpeak = (currentQuestion.q === "Listen to the number") ? currentQuestion.a : currentQuestion.q;
+        const u = new SpeechSynthesisUtterance(textToSpeak);
         u.lang = 'th-TH';
         window.speechSynthesis.speak(u); 
-    }
-</script>
-</body>
-</html>    };
-            container.appendChild(b);
-        });
     }
 
-    function speakQuestion() { 
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(currentQuestion.q === "Listen to the number" ? currentQuestion.a : currentQuestion.q);
-        u.lang = 'th-TH';
-        window.speechSynthesis.speak(u); 
-    }
+    window.onload = () => loadCategory("All");
 </script>
 </body>
 </html>
