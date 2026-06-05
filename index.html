@@ -17,8 +17,7 @@
 
 <div class="container">
     <h1>Thai Practice (Male)</h1>
-    <!-- Updated source to a simple, single-note ping sound -->
-    <audio id="dingSound" src="https://assets.mixkit.co/active_storage/sfx/2564/2564-preview.mp3" preload="auto"></audio>
+    <audio id="dingSound" src="https://actions.google.com/sounds/v1/ui/button_toggle.ogg" preload="auto"></audio>
 
     <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
@@ -43,6 +42,12 @@
 </div>
 
 <script>
+    // Audio unlock
+    document.body.addEventListener('click', () => {
+        const d = document.getElementById('dingSound');
+        d.play().then(() => { d.pause(); d.currentTime = 0; });
+    }, { once: true });
+
     const num1_10 = [];
     for(let i=1; i<=10; i++) num1_10.push({ q: "Listen to the number", t: "", a: i.toString() });
     
