@@ -55,7 +55,8 @@
             { q: "เข้าใจไหม", t: "kow jai mai", a: "Do you understand?" },
             { q: "โชคดี", t: "chok dee", a: "Good luck" },
             { q: "นิดหน่อย", t: "nit noi", a: "A little bit" },
-            { q: "ใหญ่", t: "yai", a: "Large" },
+            { q: "เล็ก", t: "lek", a: "Small" },
+            { q: "ใหญ่", t: "yiy", a: "Large/Big" },
             { q: "มาก", t: "mak", a: "A lot" },
             { q: "เขา", t: "cow", a: "He/She" },
             { q: "เรา", t: "rao", a: "We" },
@@ -69,7 +70,11 @@
             { q: "ต้องการ", t: "dong-gaan", a: "Want (formal)" },
             { q: "ผม", t: "Pom", a: "I (male)" },
             { q: "ดีมาก", t: "dee-maak", a: "Very good!" },
-            { q: "อยาก", t: "yaak", a: "Want to (before verb)" }
+            { q: "อยาก", t: "yaak", a: "Want to (before verb)" },
+            { q: "เมื่อวาน", t: "mlawan", a: "Yesterday" },
+            { q: "วันนี้", t: "One nee", a: "Today" },
+            { q: "ตอนนี้", t: "On nee", a: "Now" },
+            { q: "พรุ่งนี้", t: "Pung nee", a: "Tomorrow" }
         ],
         "Travel": [
             { q: "สนามบิน", t: "sanaam bin", a: "Airport" },
@@ -96,19 +101,27 @@
             { q: "คุณเหนื่อยไหมครับ", t: "Khun neuay mai khub", a: "Are you tired?" },
             { q: "ผมเหนื่อยครับ", t: "Pom neuay khub", a: "I'm tired" },
             { q: "สบายดีไหมครับ", t: "Sa-bai-dee mai khub", a: "How are you?" },
-            { q: "สบายดีครับ ขอบคุณครับ", t: "Sa-bai-dee khub, khob khun khub", a: "I'm good, thank you" }
+            { q: "สบายดีครับ ขอบคุณครับ", t: "Sa-bai-dee khub, khob khun khub", a: "I'm good, thank you" },
+            { q: "ว่ายน้ำ", t: "wyenam", a: "Swimming" },
+            { q: "ไปว่ายน้ำกันเลย", t: "Pye wynam ganlooey", a: "Lets go swimming" }
         ],
         "FoodDrink": [
             { q: "ไก่", t: "Gai", a: "Chicken" },
+            { q: "ไข่ไก่", t: "Khai Kai", a: "Chicken Eggs" },
             { q: "เนื้อวัว", t: "Nuea", a: "Beef" },
             { q: "หมู", t: "Mhoo", a: "Pork" },
             { q: "ปลา", t: "Plaa", a: "Fish" },
+            { q: "กุ้งใหญ่", t: "Koong heng", a: "Large Prawns" },
             { q: "ผัดกะเพราเนื้อ", t: "Pad kaprow nuea", a: "Beef stir-fry with basil" },
+            { q: "อยากกะเพราเนื้อ", t: "Ow kaprow Neea", a: "I want krapow beef" },
             { q: "ก๋วยเตี๋ยวน้ำ", t: "Kuay tiew naam", a: "Noodle soup" },
+            { q: "ก๋วยเตี๋ยวน้ำแบบไทย", t: "Wye jam naam koon", a: "Thai noodle soup" },
             { q: "ข้าวผัด", t: "Khao pad", a: "Fried rice" },
             { q: "น้ำ", t: "naam", a: "Water" },
             { q: "น้ำแข็ง", t: "naam keng", a: "Ice" },
             { q: "เบียร์ช้าง", t: "bia Chang", a: "Beer Chang" },
+            { q: "อยากเบียร์ช้าง 3 ขวด", t: "Ow beer chang sam kwad", a: "I want 3 beers" },
+            { q: "กะหรี่ปั๊บไก่", t: "Galee pib sai ghai", a: "Chicken pastie" },
             { q: "เผ็ด", t: "phet", a: "Spicy" },
             { q: "เผ็ดมาก", t: "phet mak", a: "Really spicy" },
             { q: "ไม่เผ็ด", t: "mai phet", a: "Not spicy" },
@@ -133,7 +146,8 @@
             { q: "ขนุน", t: "Kha-nun", a: "Jackfruit" },
             { q: "มะนาว", t: "Ma-nao", a: "Lime" },
             { q: "มะนาวสีเหลือง", t: "Ma-nao-see-luang", a: "Lemon" },
-            { q: "ลิ้นจี่", t: "Lin-chee", a: "Lychee" }
+            { q: "ลิ้นจี่", t: "Lin-chee", a: "Lychee" },
+            { q: "ส้มโอ", t: "Som-O", a: "Pomelo" }
         ],
         "Weather": [
             { q: "ร้อน", t: "Ron", a: "Hot" },
@@ -164,11 +178,15 @@
         
         const container = document.getElementById('options-container');
         container.innerHTML = "";
+        
         let options = [currentQuestion.a];
-        while (options.length < 4) {
+        let attempts = 0;
+        while (options.length < 4 && attempts < 20) {
             let r = currentPool[Math.floor(Math.random() * currentPool.length)].a;
             if (!options.includes(r)) options.push(r);
+            attempts++;
         }
+        
         options.sort(() => Math.random() - 0.5);
         options.forEach(opt => {
             const b = document.createElement('button');
