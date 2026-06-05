@@ -20,6 +20,7 @@
     <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
         <option value="All">All Topics</option>
+        <option value="Basics">Basics</option>
         <option value="Numbers">Numbers (1-150)</option>
         <option value="Actions">Actions & Feelings</option>
         <option value="Food">Food</option>
@@ -35,34 +36,50 @@
 </div>
 
 <script>
-    // Generate Numbers 1-150
     const numbers = [];
-    for(let i=1; i<=150; i++) numbers.push({ q: i.toString(), t: "", a: i.toString() });
+    for(let i=1; i<=150; i++) numbers.push({ q: "Listen to the number", t: "", a: i.toString() });
 
     const questionBank = {
+        "Basics": [
+            { q: "สวัสดีครับ", t: "Sawatdee khub", a: "Hello" },
+            { q: "ขอบคุณครับ", t: "Khob khun khub", a: "Thank you" }
+        ],
         "Numbers": numbers,
         "Actions": [
             { q: "ตื่นนอนครับ", t: "Tuen-non khub", a: "Wake up" },
             { q: "ผมรักคุณครับ", t: "Pom rak khun khub", a: "I love you" },
+            { q: "ผมรักคุณเช่นกันครับ", t: "Pom rak khun chen-gan khub", a: "I love you too" },
+            { q: "คุณหิวน้ำไหมครับ", t: "Khun hew-nam mai khub", a: "Are you thirsty?" },
+            { q: "คุณหิวไหมครับ", t: "Khun hew mai khub", a: "Are you hungry?" },
+            { q: "ผมหิวครับ", t: "Pom hew khub", a: "I'm hungry" },
+            { q: "คุณเหนื่อยไหมครับ", t: "Khun neuay mai khub", a: "Are you tired?" },
+            { q: "ผมเหนื่อยครับ", t: "Pom neuay khub", a: "I'm tired" },
             { q: "สบายดีไหมครับ", t: "Sa-bai-dee mai khub", a: "How are you?" },
             { q: "สบายดีครับ ขอบคุณครับ", t: "Sa-bai-dee khub, khob khun khub", a: "I'm good, thank you" }
         ],
         "Food": [
             { q: "ไก่ครับ", t: "Gai khub", a: "Chicken" },
+            { q: "เนื้อวัวครับ", t: "Nuea wua khub", a: "Beef" },
+            { q: "หมูครับ", t: "Moo khub", a: "Pork" },
             { q: "ผัดกะเพราเนื้อครับ", t: "Pad kaprow nuea khub", a: "Beef stir-fry with basil" },
             { q: "ก๋วยเตี๋ยวน้ำครับ", t: "Kuay tiew naam khub", a: "Noodle soup" },
-            { q: "ไข่ไก่ครับ", t: "Khai Kai khub", a: "Chicken Eggs" }
+            { q: "ข้าวผัดครับ", t: "Khao pad khub", a: "Fried rice" }
         ],
         "Fruit": [
             { q: "มะม่วงครับ", t: "Ma-muang khub", a: "Mango" },
-            { q: "ขนุนครับ", t: "Kha-nun khub", a: "Jackfruit" },
+            { q: "สับปะรดครับ", t: "Sap-pa-rod khub", a: "Pineapple" },
+            { q: "เงาะครับ", t: "Ngao khub", a: "Rambutan" },
+            { q: "แตงโมครับ", t: "Taeng-mo khub", a: "Watermelon" },
             { q: "มะละกอครับ", t: "Ma-la-kor khub", a: "Papaya" },
-            { q: "ส้มโอครับ", t: "Som-O khub", a: "Pomelo" },
-            { q: "สับปะรดครับ", t: "Sap-pa-rot khub", a: "Pineapple" }
+            { q: "มะพร้าวครับ", t: "Ma-phraw khub", a: "Coconut" },
+            { q: "กล้วยครับ", t: "Kluay khub", a: "Banana" },
+            { q: "ขนุนครับ", t: "Kha-nun khub", a: "Jackfruit" }
         ],
         "Weather": [
             { q: "ร้อนครับ", t: "Ron khub", a: "Hot" },
-            { q: "ฝนตกครับ", t: "Fon tok khub", a: "Raining" }
+            { q: "เย็นครับ", t: "Yen khub", a: "Cold/Cool" },
+            { q: "ฝนตกครับ", t: "Fon tok khub", a: "Raining" },
+            { q: "ลมแรงครับ", t: "Lom raeng khub", a: "Windy" }
         ]
     };
 
@@ -71,33 +88,25 @@
 
     function loadCategory(category) {
         window.speechSynthesis.cancel();
-        if (category === "All") {
-            currentPool = [].concat(...Object.values(questionBank));
-        } else {
-            currentPool = questionBank[category] || [];
-        }
+        currentPool = (category === "All") ? [].concat(...Object.values(questionBank)) : questionBank[category] || [];
         loadRandomQuestion();
     }
 
     function loadRandomQuestion() {
         if (currentPool.length === 0) return;
         currentQuestion = currentPool[Math.floor(Math.random() * currentPool.length)];
-        
         document.getElementById('question').innerText = currentQuestion.q;
-        // Hide transliteration for Numbers subject
         document.getElementById('transliteration').innerText = currentQuestion.t;
         document.getElementById('feedback').innerText = "";
         
         const container = document.getElementById('options-container');
         container.innerHTML = "";
-        
         let options = [currentQuestion.a];
         while (options.length < 4) {
-            let randomQ = currentPool[Math.floor(Math.random() * currentPool.length)];
-            if (!options.includes(randomQ.a)) options.push(randomQ.a);
+            let r = currentPool[Math.floor(Math.random() * currentPool.length)].a;
+            if (!options.includes(r)) options.push(r);
         }
         options.sort(() => Math.random() - 0.5);
-
         options.forEach(opt => {
             const b = document.createElement('button');
             b.className = 'option-btn';
@@ -105,7 +114,7 @@
             b.onclick = () => {
                 if (opt === currentQuestion.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
-                    setTimeout(loadRandomQuestion, 800);
+                    setTimeout(loadRandomQuestion, 500);
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
                 }
@@ -116,7 +125,9 @@
 
     function speakQuestion() { 
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(currentQuestion.q);
+        // Speak the Thai word for everything except numbers, which are digits
+        const textToSpeak = (currentQuestion.q === "Listen to the number") ? currentQuestion.a : currentQuestion.q;
+        const u = new SpeechSynthesisUtterance(textToSpeak);
         u.lang = 'th-TH';
         window.speechSynthesis.speak(u); 
     }
