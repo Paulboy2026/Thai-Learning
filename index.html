@@ -17,13 +17,18 @@
 
 <div class="container">
     <h1>Thai Practice (Male)</h1>
+    <!-- Audio element for the 'ding' sound -->
+    <audio id="dingSound" src="https://actions.google.com/sounds/v1/ui/check_mark_success.ogg" preload="auto"></audio>
+
     <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
         <option value="All">All Topics</option>
         <option value="Basics">Basics</option>
         <option value="General">General</option>
         <option value="Travel">Travel</option>
-        <option value="Numbers">Numbers (1-150)</option>
+        <option value="Num1_10">Numbers 1-10</option>
+        <option value="Num10_100">Numbers 10-100</option>
+        <option value="AllNumbers">All Numbers</option>
         <option value="Actions">Actions & Feelings</option>
         <option value="FoodDrink">Food & Drink</option>
         <option value="Fruit">Fruit</option>
@@ -38,8 +43,11 @@
 </div>
 
 <script>
-    const numbers = [];
-    for(let i=1; i<=150; i++) numbers.push({ q: "Listen to the number", t: "", a: i.toString() });
+    const num1_10 = [];
+    for(let i=1; i<=10; i++) num1_10.push({ q: "Listen to the number", t: "", a: i.toString() });
+    
+    const num10_100 = [];
+    for(let i=10; i<=100; i++) num10_100.push({ q: "Listen to the number", t: "", a: i.toString() });
 
     const questionBank = {
         "Basics": [
@@ -90,7 +98,9 @@
             { q: "นี่เท่าไร", t: "un-nee tao-rai khub", a: "This one how much?" },
             { q: "ลดได้ไหมครับ", t: "lot dai mai khub", a: "Can you give me a discount?" }
         ],
-        "Numbers": numbers,
+        "Num1_10": num1_10,
+        "Num10_100": num10_100,
+        "AllNumbers": num1_10.concat(num10_100),
         "Actions": [
             { q: "ตื่นนอนครับ", t: "Tuen-non khub", a: "Wake up" },
             { q: "ผมรักคุณครับ", t: "Pom rak khun khub", a: "I love you" },
@@ -195,7 +205,8 @@
             b.onclick = () => {
                 if (opt === currentQuestion.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
-                    setTimeout(loadRandomQuestion, 500);
+                    document.getElementById('dingSound').play(); // Play ding
+                    setTimeout(loadRandomQuestion, 1000);
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
                 }
