@@ -21,9 +21,11 @@
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
         <option value="All">All Topics</option>
         <option value="Basics">Basics</option>
+        <option value="General">General</option>
+        <option value="Travel">Travel</option>
         <option value="Numbers">Numbers (1-150)</option>
         <option value="Actions">Actions & Feelings</option>
-        <option value="Food">Food</option>
+        <option value="FoodDrink">Food & Drink</option>
         <option value="Fruit">Fruit</option>
         <option value="Weather">Weather</option>
     </select>
@@ -44,6 +46,45 @@
             { q: "สวัสดีครับ", t: "Sawatdee khub", a: "Hello" },
             { q: "ขอบคุณครับ", t: "Khob khun khub", a: "Thank you" }
         ],
+        "General": [
+            { q: "ใช่", t: "chai", a: "Yes" },
+            { q: "ไม่ใช่", t: "mai chai", a: "No" },
+            { q: "ได้", t: "dai", a: "Can" },
+            { q: "ไม่ได้", t: "mai dai", a: "Cannot" },
+            { q: "ไม่เป็นไร", t: "mai pen rai", a: "Never mind" },
+            { q: "เข้าใจไหม", t: "kow jai mai", a: "Do you understand?" },
+            { q: "โชคดี", t: "chok dee", a: "Good luck" },
+            { q: "นิดหน่อย", t: "nit noi", a: "A little bit" },
+            { q: "ใหญ่", t: "yai", a: "Large" },
+            { q: "มาก", t: "mak", a: "A lot" },
+            { q: "เขา", t: "cow", a: "He/She" },
+            { q: "เรา", t: "rao", a: "We" },
+            { q: "คุณ", t: "khun", a: "You" },
+            { q: "สี", t: "see", a: "Colour" },
+            { q: "คุณชอบสีอะไร", t: "khun chob see arai", a: "What colour do you like?" },
+            { q: "ผมชอบสี", t: "pom chob see", a: "I like..." },
+            { q: "ไม่ได้", t: "mhai-dai", a: "Can't (polite)" },
+            { q: "อะไรนะ", t: "arai-na", a: "Beg your pardon?" },
+            { q: "พูดภาษาอังกฤษได้ไหม", t: "pood paasaa anggrit dai mai", a: "Can you speak English?" },
+            { q: "ต้องการ", t: "dong-gaan", a: "Want (formal)" },
+            { q: "ผม", t: "Pom", a: "I (male)" },
+            { q: "ดีมาก", t: "dee-maak", a: "Very good!" },
+            { q: "อยาก", t: "yaak", a: "Want to (before verb)" }
+        ],
+        "Travel": [
+            { q: "สนามบิน", t: "sanaam bin", a: "Airport" },
+            { q: "ห้องน้ำ", t: "hong nam", a: "Toilet" },
+            { q: "ห้องน้ำอยู่ที่ไหน", t: "hong-nam yoo-nai", a: "Where is the toilet?" },
+            { q: "ไปที่", t: "pai tee", a: "Go to" },
+            { q: "ใช้มิเตอร์ไหมครับ", t: "chai metah... mai khub", a: "Do you use a meter (taxi)?" },
+            { q: "ตรงไปครับ", t: "drong pai khub", a: "Go straight" },
+            { q: "เลี้ยวขวาครับ", t: "liao kwaa khub", a: "Turn right" },
+            { q: "เลี้ยวซ้ายครับ", t: "liao sai khub", a: "Turn left" },
+            { q: "จอดที่นี่ครับ", t: "jot tee-nee khub", a: "Stop here" },
+            { q: "กรุงเทพฯ", t: "krung-thep", a: "Bangkok" },
+            { q: "นี่เท่าไร", t: "un-nee tao-rai khub", a: "This one how much?" },
+            { q: "ลดได้ไหมครับ", t: "lot dai mai khub", a: "Can you give me a discount?" }
+        ],
         "Numbers": numbers,
         "Actions": [
             { q: "ตื่นนอนครับ", t: "Tuen-non khub", a: "Wake up" },
@@ -57,29 +98,51 @@
             { q: "สบายดีไหมครับ", t: "Sa-bai-dee mai khub", a: "How are you?" },
             { q: "สบายดีครับ ขอบคุณครับ", t: "Sa-bai-dee khub, khob khun khub", a: "I'm good, thank you" }
         ],
-        "Food": [
-            { q: "ไก่ครับ", t: "Gai khub", a: "Chicken" },
-            { q: "เนื้อวัวครับ", t: "Nuea wua khub", a: "Beef" },
-            { q: "หมูครับ", t: "Moo khub", a: "Pork" },
-            { q: "ผัดกะเพราเนื้อครับ", t: "Pad kaprow nuea khub", a: "Beef stir-fry with basil" },
-            { q: "ก๋วยเตี๋ยวน้ำครับ", t: "Kuay tiew naam khub", a: "Noodle soup" },
-            { q: "ข้าวผัดครับ", t: "Khao pad khub", a: "Fried rice" }
+        "FoodDrink": [
+            { q: "ไก่", t: "Gai", a: "Chicken" },
+            { q: "เนื้อวัว", t: "Nuea", a: "Beef" },
+            { q: "หมู", t: "Mhoo", a: "Pork" },
+            { q: "ปลา", t: "Plaa", a: "Fish" },
+            { q: "ผัดกะเพราเนื้อ", t: "Pad kaprow nuea", a: "Beef stir-fry with basil" },
+            { q: "ก๋วยเตี๋ยวน้ำ", t: "Kuay tiew naam", a: "Noodle soup" },
+            { q: "ข้าวผัด", t: "Khao pad", a: "Fried rice" },
+            { q: "น้ำ", t: "naam", a: "Water" },
+            { q: "น้ำแข็ง", t: "naam keng", a: "Ice" },
+            { q: "เบียร์ช้าง", t: "bia Chang", a: "Beer Chang" },
+            { q: "เผ็ด", t: "phet", a: "Spicy" },
+            { q: "เผ็ดมาก", t: "phet mak", a: "Really spicy" },
+            { q: "ไม่เผ็ด", t: "mai phet", a: "Not spicy" },
+            { q: "เผ็ดนิดหน่อย", t: "phet nit nawy", a: "A little bit spicy" },
+            { q: "ใส่ถุง", t: "Sai Tung", a: "Take away" },
+            { q: "แพง", t: "pang", a: "Expensive" },
+            { q: "แพงมาก", t: "pang mak", a: "Very expensive" },
+            { q: "ถูก", t: "took", a: "Cheap" },
+            { q: "อยากกาแฟ", t: "aow ga-fae", a: "Want coffee" },
+            { q: "เอาส้มตำครับ", t: "aow som-tam khub", a: "I want som tam" },
+            { q: "ขอ...", t: "khor / aow... khub", a: "Give me (food name)" },
+            { q: "ขอน้ำเปล่าหน่อยครับ", t: "khor nam-plao noi khub", a: "Give me water" }
         ],
         "Fruit": [
-            { q: "มะม่วงครับ", t: "Ma-muang khub", a: "Mango" },
-            { q: "สับปะรดครับ", t: "Sap-pa-rod khub", a: "Pineapple" },
-            { q: "เงาะครับ", t: "Ngao khub", a: "Rambutan" },
-            { q: "แตงโมครับ", t: "Taeng-mo khub", a: "Watermelon" },
-            { q: "มะละกอครับ", t: "Ma-la-kor khub", a: "Papaya" },
-            { q: "มะพร้าวครับ", t: "Ma-phraw khub", a: "Coconut" },
-            { q: "กล้วยครับ", t: "Kluay khub", a: "Banana" },
-            { q: "ขนุนครับ", t: "Kha-nun khub", a: "Jackfruit" }
+            { q: "มะม่วง", t: "Ma-muang", a: "Mango" },
+            { q: "สับปะรด", t: "Sap-pa-rod", a: "Pineapple" },
+            { q: "เงาะ", t: "Ngao", a: "Rambutan" },
+            { q: "แตงโม", t: "Taeng-mo", a: "Watermelon" },
+            { q: "มะละกอ", t: "Ma-la-kor", a: "Papaya" },
+            { q: "มะพร้าว", t: "Ma-phraw", a: "Coconut" },
+            { q: "กล้วย", t: "Gluay", a: "Banana" },
+            { q: "ขนุน", t: "Kha-nun", a: "Jackfruit" },
+            { q: "มะนาว", t: "Ma-nao", a: "Lime" },
+            { q: "มะนาวสีเหลือง", t: "Ma-nao-see-luang", a: "Lemon" },
+            { q: "ลิ้นจี่", t: "Lin-chee", a: "Lychee" }
         ],
         "Weather": [
-            { q: "ร้อนครับ", t: "Ron khub", a: "Hot" },
-            { q: "เย็นครับ", t: "Yen khub", a: "Cold/Cool" },
-            { q: "ฝนตกครับ", t: "Fon tok khub", a: "Raining" },
-            { q: "ลมแรงครับ", t: "Lom raeng khub", a: "Windy" }
+            { q: "ร้อน", t: "Ron", a: "Hot" },
+            { q: "เย็น", t: "Yen", a: "Cold/Cool" },
+            { q: "หนาว", t: "Nao", a: "Cold" },
+            { q: "ฝนตก", t: "Fon tok", a: "Raining" },
+            { q: "ลมแรง", t: "Lom raeng", a: "Windy" },
+            { q: "ฝนกำลังจะตก", t: "Fon kam-lang ja tok", a: "It's going to rain" },
+            { q: "ข้างนอกร้อน", t: "Khang-nok ron", a: "It's hot outside" }
         ]
     };
 
@@ -125,7 +188,6 @@
 
     function speakQuestion() { 
         window.speechSynthesis.cancel();
-        // Speak the Thai word for everything except numbers, which are digits
         const textToSpeak = (currentQuestion.q === "Listen to the number") ? currentQuestion.a : currentQuestion.q;
         const u = new SpeechSynthesisUtterance(textToSpeak);
         u.lang = 'th-TH';
