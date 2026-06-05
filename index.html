@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Practice App (Expanded)</title>
+    <title>Thai Practice App (All Subjects)</title>
     <style>
         :root { --primary: #00247D; --accent: #CF142B; --bg: #f4f6f9; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -19,11 +19,12 @@
     <h1>Thai Practice (Male)</h1>
     <label for="topic-nav">Choose a Topic:</label>
     <select id="topic-nav" onchange="loadCategory(this.value)" style="width: 100%; padding: 10px; margin-bottom: 15px;">
+        <option value="All">All Topics</option>
         <option value="Basics">Basics</option>
-        <option value="Food">Food & Meat</option>
+        <option value="Actions">Actions & Feelings</option>
+        <option value="Food">Food (Street Food/Meat)</option>
         <option value="Fruit">Fruit</option>
         <option value="Weather">Weather</option>
-        <option value="Numbers">Numbers 1-100</option>
     </select>
 
     <div id="question" style="font-size: 20px; margin: 20px 0; font-weight: bold;">Loading...</div>
@@ -37,35 +38,59 @@
     const questionBank = {
         "Basics": [
             { q: "สวัสดีครับ", t: "Sawatdee khub", a: "Hello" },
-            { q: "ขอบคุณครับ", t: "Khob khun khub", a: "Thank you" },
-            { q: "ห้องน้ำอยู่ที่ไหนครับ", t: "Hong nam yoo tee nai khub", a: "Where is the toilet" },
-            { q: "ราคาเท่าไหร่ครับ", t: "Ra-ka tao-rai khub", a: "How much is it" }
+            { q: "ขอบคุณครับ", t: "Khob khun khub", a: "Thank you" }
+        ],
+        "Actions": [
+            { q: "ตื่นนอนครับ", t: "Tuen-non khub", a: "Wake up" },
+            { q: "ผมรักคุณครับ", t: "Pom rak khun khub", a: "I love you" },
+            { q: "ผมรักคุณเช่นกันครับ", t: "Pom rak khun chen-gan khub", a: "I love you too" },
+            { q: "คุณหิวน้ำไหมครับ", t: "Khun hew-nam mai khub", a: "Are you thirsty?" },
+            { q: "คุณหิวไหมครับ", t: "Khun hew mai khub", a: "Are you hungry?" },
+            { q: "ผมหิวครับ", t: "Pom hew khub", a: "I'm hungry" },
+            { q: "คุณเหนื่อยไหมครับ", t: "Khun neuay mai khub", a: "Are you tired?" },
+            { q: "ผมเหนื่อยครับ", t: "Pom neuay khub", a: "I'm tired" },
+            { q: "คุณสบายดีไหมครับ", t: "Khun sa-bai-dee mai khub", a: "How are you?" },
+            { q: "สบายดีครับ ขอบคุณครับ", t: "Sa-bai-dee khub, khob khun khub", a: "I'm good, thank you" }
         ],
         "Food": [
-            { q: "ผมอยากทานไก่ครับ", t: "Pom yak tan gai khub", a: "I want to eat chicken" },
-            { q: "ผมอยากทานเนื้อวัวครับ", t: "Pom yak tan nuea wua khub", a: "I want to eat beef" },
-            { q: "ผมอยากทานหมูครับ", t: "Pom yak tan moo khub", a: "I want to eat pork" }
+            { q: "ไก่ครับ", t: "Gai khub", a: "Chicken" },
+            { q: "เนื้อวัวครับ", t: "Nuea wua khub", a: "Beef" },
+            { q: "หมูครับ", t: "Moo khub", a: "Pork" },
+            { q: "ผัดกะเพราเนื้อครับ", t: "Pad kaprow nuea khub", a: "Beef stir-fry with basil" },
+            { q: "ก๋วยเตี๋ยวน้ำครับ", t: "Kuay tiew naam khub", a: "Noodle soup" },
+            { q: "ข้าวผัดครับ", t: "Khao pad khub", a: "Fried rice" }
         ],
         "Fruit": [
-            { q: "ผมชอบทานมะละกอครับ", t: "Pom chob tan ma-la-kor khub", a: "I like to eat papaya" },
-            { q: "ผมชอบทานสับปะรดครับ", t: "Pom chob tan sap-pa-rod khub", a: "I like to eat pineapple" },
-            { q: "ผมชอบทานขนุนครับ", t: "Pom chob tan ka-noon khub", a: "I like to eat jackfruit" }
+            { q: "มะม่วงครับ", t: "Ma-muang khub", a: "Mango" },
+            { q: "สับปะรดครับ", t: "Sap-pa-rod khub", a: "Pineapple" },
+            { q: "เงาะครับ", t: "Ngao khub", a: "Rambutan" },
+            { q: "แตงโมครับ", t: "Taeng-mo khub", a: "Watermelon" },
+            { q: "มะละกอครับ", t: "Ma-la-kor khub", a: "Papaya" },
+            { q: "มะพร้าวครับ", t: "Ma-phraw khub", a: "Coconut" },
+            { q: "กล้วยครับ", t: "Kluay khub", a: "Banana" },
+            { q: "ขนุนครับ", t: "Kha-nun khub", a: "Jackfruit" }
         ],
         "Weather": [
-            { q: "วันนี้อากาศร้อนครับ", t: "Wan-nee a-kat ron khub", a: "It is hot today" },
-            { q: "วันนี้อากาศเย็นครับ", t: "Wan-nee a-kat yen khub", a: "It is cold today" },
-            { q: "ฝนกำลังจะตกครับ", t: "Fon kam-lang ja tok khub", a: "It is going to rain" }
-        ],
-        "Numbers": Array.from({length: 100}, (_, i) => ({
-            q: (i + 1).toString(), t: "Number " + (i + 1), a: (i + 1).toString()
-        }))
+            { q: "ร้อนครับ", t: "Ron khub", a: "Hot" },
+            { q: "เย็นครับ", t: "Yen khub", a: "Cold/Cool" },
+            { q: "ฝนตกครับ", t: "Fon tok khub", a: "Raining" },
+            { q: "ลมแรงครับ", t: "Lom raeng khub", a: "Windy" }
+        ]
     };
 
     let currentPool = [];
     let currentQuestion = null;
 
     function loadCategory(category) {
-        currentPool = questionBank[category] || [];
+        window.speechSynthesis.cancel();
+        document.getElementById('feedback').innerText = "";
+        
+        if (category === "All") {
+            // Combine all arrays in questionBank
+            currentPool = [].concat(...Object.values(questionBank));
+        } else {
+            currentPool = questionBank[category] || [];
+        }
         loadRandomQuestion();
     }
 
@@ -75,7 +100,6 @@
         
         document.getElementById('question').innerText = currentQuestion.q;
         document.getElementById('transliteration').innerText = currentQuestion.t;
-        document.getElementById('feedback').innerText = "";
         
         const container = document.getElementById('options-container');
         container.innerHTML = "";
@@ -94,7 +118,7 @@
             b.onclick = () => {
                 if (opt === currentQuestion.a) {
                     document.getElementById('feedback').innerText = "Correct! ✅";
-                    setTimeout(loadRandomQuestion, 1000);
+                    setTimeout(loadRandomQuestion, 800);
                 } else {
                     document.getElementById('feedback').innerText = "Try again! ❌";
                 }
@@ -110,7 +134,7 @@
         window.speechSynthesis.speak(u); 
     }
 
-    window.onload = () => loadCategory("Basics");
+    window.onload = () => loadCategory("All");
 </script>
 </body>
 </html>
